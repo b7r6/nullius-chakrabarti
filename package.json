@@ -1,0 +1,17 @@
+{
+  "name": "nullius-chakrabarti",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Game-theoretic analysis of Saikat Chakrabarti's 2026 congressional campaign",
+  "scripts": {
+    "build": "node build.js",
+    "serve": "npx serve dist"
+  },
+  "keywords": [
+    "politics",
+    "game-theory",
+    "bayesian",
+    "nullius-in-verba"
+  ],
+  "license": "MIT"
+}

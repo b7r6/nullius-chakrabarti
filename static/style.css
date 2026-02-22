@@ -1,0 +1,880 @@
+/* NULLIUS CHAKRABARTI
+   Game-theoretic candidate analysis
+   ========================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+:root {
+  /* Colors - analytical/neutral palette */
+  --primary: #1a1a2e;
+  --primary-light: #16213e;
+  --accent: #0f4c75;
+  --accent-light: #3282b8;
+  --highlight: #bbe1fa;
+  --warning: #e63946;
+  --success: #2a9d8f;
+
+  /* Neutrals */
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #e5e5e5;
+  --gray-300: #d4d4d4;
+  --gray-400: #a3a3a3;
+  --gray-500: #737373;
+  --gray-600: #525252;
+  --gray-700: #404040;
+  --gray-800: #262626;
+  --gray-900: #171717;
+  --black: #0a0a0a;
+  --white: #ffffff;
+
+  /* Typography */
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Layout */
+  --max-width: 1100px;
+  --content-width: 720px;
+  --nav-height: 64px;
+}
+
+/* Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--gray-900);
+  background: var(--white);
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+p {
+  max-width: 65ch;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+strong {
+  font-weight: 600;
+  color: var(--black);
+}
+
+blockquote {
+  border-left: 4px solid var(--accent);
+  padding-left: var(--space-4);
+  margin: var(--space-6) 0;
+  font-style: italic;
+  color: var(--gray-700);
+}
+
+blockquote cite {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: 0.875rem;
+  font-style: normal;
+  color: var(--gray-500);
+}
+
+/* Layout */
+.site {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+  padding-top: var(--nav-height);
+}
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--nav-height);
+  background: var(--primary);
+  border-bottom: 2px solid var(--accent);
+}
+
+.nav-inner {
+  max-width: var(--max-width);
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--white);
+}
+
+.nav-logo:hover {
+  text-decoration: none;
+  color: var(--highlight);
+}
+
+.nav-links {
+  display: flex;
+  gap: var(--space-6);
+}
+
+.nav-link {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-300);
+  transition: color 0.15s ease;
+}
+
+.nav-link:hover {
+  color: var(--white);
+  text-decoration: none;
+}
+
+.nav-link-external::after {
+  content: " ↗";
+  font-size: 0.75rem;
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+
+.hero {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--primary-light) 100%
+  );
+  position: relative;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(
+      circle at 20% 80%,
+      rgba(15, 76, 117, 0.3) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(50, 130, 184, 0.2) 0%,
+      transparent 50%
+    );
+  pointer-events: none;
+}
+
+.hero-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-16) var(--space-6);
+  position: relative;
+  z-index: 1;
+}
+
+.hero-headline {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--white);
+  margin-bottom: var(--space-4);
+}
+
+.hero-subhead {
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
+  font-weight: 400;
+  color: var(--gray-300);
+  margin-bottom: var(--space-8);
+  max-width: 600px;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-8);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--accent-light);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background: var(--accent);
+  text-decoration: none;
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 2px solid var(--white);
+  color: var(--white);
+}
+
+.btn-secondary:hover {
+  background: var(--white);
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.btn-large {
+  padding: var(--space-5) var(--space-10);
+  font-size: 1rem;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+
+.section {
+  padding: var(--space-16) var(--space-6);
+}
+
+.section-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.section-headline {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  margin-bottom: var(--space-6);
+  color: var(--primary);
+}
+
+.section-intro {
+  font-size: 1.125rem;
+  color: var(--gray-600);
+  margin-bottom: var(--space-8);
+  max-width: var(--content-width);
+}
+
+.section-body {
+  font-size: 1.0625rem;
+  color: var(--gray-700);
+  line-height: 1.8;
+  max-width: var(--content-width);
+}
+
+/* Hero Small (interior pages) */
+.section-hero-small {
+  padding: var(--space-16) var(--space-6) var(--space-10);
+  background: var(--gray-100);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.page-headline {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: var(--space-4);
+}
+
+.page-intro {
+  font-size: 1.125rem;
+  color: var(--gray-600);
+  max-width: var(--content-width);
+}
+
+/* ============================================
+   SUMMARY SECTION
+   ============================================ */
+
+.section-summary {
+  background: var(--white);
+}
+
+/* ============================================
+   KEY FINDINGS
+   ============================================ */
+
+.section-findings {
+  background: var(--gray-50);
+}
+
+.findings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-6);
+}
+
+.finding-card {
+  background: var(--white);
+  border: 2px solid var(--gray-200);
+  padding: var(--space-8);
+  text-align: center;
+  transition: border-color 0.2s ease;
+}
+
+.finding-card:hover {
+  border-color: var(--accent);
+}
+
+.finding-stat {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: var(--space-2);
+}
+
+.finding-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: var(--space-2);
+}
+
+.finding-context {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+  line-height: 1.5;
+}
+
+/* ============================================
+   STRAWMAN / STEELMAN / REASONABLE-MAN
+   ============================================ */
+
+.section-ssrm {
+  background: var(--white);
+}
+
+.ssrm-treatment {
+  margin-bottom: var(--space-6);
+  padding: var(--space-6);
+  border-left: 4px solid var(--gray-300);
+}
+
+.ssrm-treatment.strawman {
+  background: var(--gray-50);
+  border-left-color: var(--gray-400);
+}
+
+.ssrm-treatment.steelman {
+  background: rgba(15, 76, 117, 0.05);
+  border-left-color: var(--accent);
+}
+
+.ssrm-treatment.reasonable-man {
+  background: rgba(42, 157, 143, 0.05);
+  border-left-color: var(--success);
+}
+
+.treatment-title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-3);
+  color: var(--gray-600);
+}
+
+.ssrm-treatment.strawman .treatment-title {
+  color: var(--gray-500);
+}
+
+.ssrm-treatment.steelman .treatment-title {
+  color: var(--accent);
+}
+
+.ssrm-treatment.reasonable-man .treatment-title {
+  color: var(--success);
+}
+
+.treatment-body {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--gray-700);
+}
+
+/* ============================================
+   CTA SECTION
+   ============================================ */
+
+.section-cta {
+  background: var(--primary);
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+}
+
+.cta-text {
+  font-size: 1.125rem;
+  color: var(--gray-300);
+  margin-bottom: var(--space-6);
+}
+
+/* ============================================
+   BIOGRAPHY PAGE
+   ============================================ */
+
+.section-biography {
+  background: var(--white);
+}
+
+.bio-section {
+  margin-bottom: var(--space-12);
+  padding-bottom: var(--space-10);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.bio-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.bio-section-title {
+  font-size: 1.5rem;
+  color: var(--accent);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-3);
+  border-bottom: 2px solid var(--accent);
+}
+
+.bio-section-content {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--gray-700);
+  max-width: var(--content-width);
+}
+
+.bio-section-content h4 {
+  font-size: 1.125rem;
+  color: var(--gray-800);
+  margin: var(--space-6) 0 var(--space-3);
+}
+
+.bio-section-content p {
+  margin-bottom: var(--space-4);
+}
+
+.bio-section-content ul,
+.bio-section-content ol {
+  margin: var(--space-4) 0;
+  padding-left: var(--space-6);
+}
+
+.bio-section-content li {
+  margin-bottom: var(--space-2);
+}
+
+.bio-section-content .notable {
+  background: rgba(15, 76, 117, 0.08);
+  padding: var(--space-4);
+  border-left: 3px solid var(--accent);
+  margin: var(--space-4) 0;
+}
+
+.bio-section-content .controversy {
+  background: rgba(230, 57, 70, 0.08);
+  padding: var(--space-4);
+  border-left: 3px solid var(--warning);
+  margin: var(--space-4) 0;
+}
+
+.bio-section-content .missing-endorsements {
+  background: rgba(230, 57, 70, 0.05);
+  padding: var(--space-4);
+  border-radius: 4px;
+}
+
+.bio-section-content .missing-endorsements li {
+  color: var(--gray-700);
+}
+
+/* Tables */
+.bio-table,
+.finance-table,
+.opponents-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-4) 0;
+  font-size: 0.9375rem;
+}
+
+.bio-table td,
+.finance-table td,
+.opponents-table td,
+.opponents-table th {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.bio-table td:first-child,
+.finance-table td:first-child {
+  font-weight: 600;
+  color: var(--gray-600);
+  width: 40%;
+}
+
+.opponents-table th {
+  text-align: left;
+  font-weight: 600;
+  background: var(--gray-100);
+}
+
+/* ============================================
+   ANALYSIS PAGE
+   ============================================ */
+
+.section-analysis {
+  background: var(--white);
+}
+
+.analysis-section {
+  margin-bottom: var(--space-12);
+  padding-bottom: var(--space-10);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.analysis-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.analysis-section-title {
+  font-size: 1.375rem;
+  color: var(--accent);
+  margin-bottom: var(--space-6);
+}
+
+.analysis-section-content {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--gray-700);
+  max-width: var(--content-width);
+}
+
+.analysis-section-content p {
+  margin-bottom: var(--space-4);
+}
+
+.analysis-section-content ol {
+  margin: var(--space-4) 0;
+  padding-left: var(--space-6);
+}
+
+.analysis-section-content li {
+  margin-bottom: var(--space-3);
+}
+
+/* Diagram */
+.chain-diagram {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  background: var(--gray-100);
+  padding: var(--space-6);
+  border-radius: 4px;
+  overflow-x: auto;
+  line-height: 1.6;
+  margin: var(--space-4) 0;
+}
+
+/* Analysis Tables */
+.signal-table,
+.bayes-table,
+.decision-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-6) 0;
+  font-size: 0.9375rem;
+}
+
+.signal-table th,
+.bayes-table th,
+.decision-table th {
+  text-align: left;
+  font-weight: 600;
+  padding: var(--space-3) var(--space-4);
+  background: var(--gray-100);
+  border-bottom: 2px solid var(--gray-300);
+}
+
+.signal-table td,
+.bayes-table td,
+.decision-table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.bayes-table .final {
+  background: rgba(15, 76, 117, 0.1);
+  font-weight: 600;
+}
+
+.decision-table .optimal {
+  background: rgba(42, 157, 143, 0.15);
+}
+
+.key-question {
+  font-size: 1.125rem;
+  font-style: italic;
+  color: var(--accent);
+  text-align: center;
+  padding: var(--space-6);
+  background: var(--gray-50);
+  border: 2px solid var(--accent);
+  margin: var(--space-6) 0;
+}
+
+/* GitHub CTA */
+.section-github-cta {
+  background: var(--gray-100);
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+}
+
+.section-github-cta h3 {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-4);
+}
+
+.section-github-cta p {
+  color: var(--gray-600);
+  margin-bottom: var(--space-6);
+  max-width: none;
+}
+
+/* ============================================
+   METHODOLOGY PAGE
+   ============================================ */
+
+.section-methodology {
+  background: var(--white);
+}
+
+.methodology-section {
+  margin-bottom: var(--space-10);
+  padding-bottom: var(--space-8);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.methodology-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.methodology-section-title {
+  font-size: 1.375rem;
+  color: var(--accent);
+  margin-bottom: var(--space-4);
+}
+
+.methodology-section-body {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--gray-700);
+  max-width: var(--content-width);
+}
+
+.methodology-section-body ol,
+.methodology-section-body ul {
+  margin: var(--space-4) 0;
+  padding-left: var(--space-6);
+}
+
+.methodology-section-body li {
+  margin-bottom: var(--space-2);
+}
+
+/* ============================================
+   SOURCES PAGE
+   ============================================ */
+
+.section-sources {
+  background: var(--white);
+}
+
+.sources-category {
+  margin-bottom: var(--space-10);
+}
+
+.sources-category:last-child {
+  margin-bottom: 0;
+}
+
+.sources-category-title {
+  font-size: 1.25rem;
+  color: var(--accent);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-2);
+  border-bottom: 2px solid var(--gray-200);
+}
+
+.sources-list {
+  list-style: none;
+  padding: 0;
+}
+
+.sources-list li {
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.sources-list a {
+  color: var(--gray-800);
+  text-decoration: none;
+}
+
+.sources-list a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.footer {
+  padding: var(--space-10) var(--space-6);
+  background: var(--primary);
+  color: var(--white);
+}
+
+.footer-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-tagline {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--gray-400);
+  margin-bottom: var(--space-4);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-4);
+}
+
+.footer-link {
+  font-size: 0.875rem;
+  color: var(--gray-400);
+}
+
+.footer-link:hover {
+  color: var(--white);
+}
+
+.footer-copy {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--gray-600);
+  letter-spacing: 0.05em;
+}
+
+/* ============================================
+   MOBILE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+
+  .hero {
+    min-height: auto;
+  }
+
+  .hero-inner {
+    padding: var(--space-12) var(--space-6);
+  }
+
+  .section {
+    padding: var(--space-12) var(--space-5);
+  }
+
+  .findings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+}
