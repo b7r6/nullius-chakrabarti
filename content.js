@@ -1,17 +1,18 @@
 /**
  * NULLIUS CHAKRABARTI - Content
  *
- * Four perspectives on the same facts:
- * - red/en: Republican framing, English
- * - red/es: Republican framing, Spanish
- * - blue/en: Democratic framing, English
- * - blue/es: Democratic framing, Spanish
+ * Three views:
+ * - balanced: Fair side-by-side comparison (default)
+ * - conservative: Steelman conservative critique
+ * - progressive: Steelman progressive defense
+ *
+ * Two languages: en, es
  */
 
 export const content = {
   siteName: "NULLIUS",
 
-  // Navigation - same across all views
+  // Navigation
   nav: {
     en: {
       home: "Home",
@@ -31,6 +32,20 @@ export const content = {
     },
   },
 
+  // View labels for dropdown
+  views: {
+    en: {
+      balanced: "Balanced View",
+      conservative: "Conservative Lens",
+      progressive: "Progressive Lens",
+    },
+    es: {
+      balanced: "Vista Balanceada",
+      conservative: "Lente Conservador",
+      progressive: "Lente Progresista",
+    },
+  },
+
   // Hero section
   hero: {
     headline: {
@@ -42,11 +57,15 @@ export const content = {
       es: "No creas en la palabra de nadie.",
     },
     subhead: {
-      red: {
+      balanced: {
+        en: "An evidence-based analysis of Saikat Chakrabarti's 2026 congressional campaign.",
+        es: "Un análisis basado en evidencia de la campaña al Congreso de Saikat Chakrabarti en 2026.",
+      },
+      conservative: {
         en: "A wealthy Silicon Valley operative who bankrolled AOC now wants Nancy Pelosi's seat.",
         es: "Un operador adinerado de Silicon Valley que financió a AOC ahora quiere el escaño de Nancy Pelosi.",
       },
-      blue: {
+      progressive: {
         en: "The architect of the progressive movement's greatest upset seeks to continue the fight in Congress.",
         es: "El arquitecto del mayor triunfo del movimiento progresista busca continuar la lucha en el Congreso.",
       },
@@ -60,7 +79,19 @@ export const content = {
       es: "La Pregunta",
     },
     body: {
-      red: {
+      balanced: {
+        en: `A friend-of-a-friend endorses Saikat Chakrabarti for Congress. Before you trust that endorsement, consider the evidence:
+
+<strong>Notable endorsement gaps exist.</strong> Justice Democrats—which he co-founded—endorsed other California candidates but not him. AOC—whose career he launched—has said nothing. Bernie Sanders—his former employer—silence.
+
+This site presents the facts and lets you evaluate both favorable and critical interpretations. Every claim is sourced. You decide what they mean.`,
+        es: `Un amigo de un amigo respalda a Saikat Chakrabarti para el Congreso. Antes de confiar en ese respaldo, considera la evidencia:
+
+<strong>Existen brechas notables de respaldo.</strong> Justice Democrats—que él co-fundó—respaldó a otros candidatos de California pero no a él. AOC—cuya carrera él lanzó—no ha dicho nada. Bernie Sanders—su ex empleador—silencio.
+
+Este sitio presenta los hechos y te permite evaluar tanto las interpretaciones favorables como las críticas. Cada afirmación tiene fuente. Tú decides qué significan.`,
+      },
+      conservative: {
         en: `A friend-of-a-friend endorses Saikat Chakrabarti for Congress. Before you trust that endorsement, consider:
 
 <strong>His own organizations won't endorse him.</strong> Justice Democrats—which he co-founded—endorsed other California candidates but not him. AOC—whose career he launched—has said nothing. Bernie Sanders—his former employer—silence.
@@ -76,7 +107,7 @@ This site presents the facts. Every claim is sourced. You decide what they mean.
 
 Este sitio presenta los hechos. Cada afirmación tiene fuente. Tú decides qué significan.`,
       },
-      blue: {
+      progressive: {
         en: `A friend-of-a-friend endorses Saikat Chakrabarti for Congress. The endorsement chain matters—but so does understanding why institutional progressives are cautious.
 
 <strong>He built the infrastructure that elected The Squad.</strong> Justice Democrats, Brand New Congress, the AOC campaign—all his work. Now he's self-funding to avoid the conflicts that plagued his organizational work.
@@ -105,11 +136,15 @@ El silencio de JD y AOC merece investigación, no suposición. Este sitio presen
           es: "P(Alta Calidad)",
         },
         context: {
-          red: {
+          balanced: {
+            en: "Bayesian posterior probability of high-quality candidacy after updating on all available signals",
+            es: "Probabilidad posterior bayesiana de candidatura de alta calidad después de actualizar con todas las señales disponibles",
+          },
+          conservative: {
             en: "Probability he'll deliver on promises after updating on insider silence",
             es: "Probabilidad de que cumpla promesas después de actualizar por el silencio de los que lo conocen",
           },
-          blue: {
+          progressive: {
             en: "Bayesian posterior—lower than we'd like, but not disqualifying",
             es: "Posterior bayesiano—más bajo de lo que quisiéramos, pero no descalificante",
           },
@@ -122,11 +157,15 @@ El silencio de JD y AOC merece investigación, no suposición. Este sitio presen
           es: "P(Calidad Media)",
         },
         context: {
-          red: {
+          balanced: {
+            en: "Most likely outcome based on the evidence: moderate effectiveness",
+            es: "Resultado más probable basado en la evidencia: efectividad moderada",
+          },
+          conservative: {
             en: "Most likely outcome: partial delivery, familiar progressive disappointment",
             es: "Resultado más probable: cumplimiento parcial, la decepción progresista de siempre",
           },
-          blue: {
+          progressive: {
             en: "Most likely outcome: pragmatic compromise, which may be what the moment requires",
             es: "Resultado más probable: compromiso pragmático, que puede ser lo que el momento requiere",
           },
@@ -139,11 +178,15 @@ El silencio de JD y AOC merece investigación, no suposición. Este sitio presen
           es: "VE(Investigar) vs VE(Respaldar)",
         },
         context: {
-          red: {
+          balanced: {
+            en: "Expected value analysis favors gathering more information before committing",
+            es: "El análisis de valor esperado favorece reunir más información antes de comprometerse",
+          },
+          conservative: {
             en: "Don't trust—verify. The math says dig deeper before committing.",
             es: "No confíes—verifica. Las matemáticas dicen que investigues más antes de comprometerte.",
           },
-          blue: {
+          progressive: {
             en: "Worth understanding the silence before deciding. Information has value.",
             es: "Vale la pena entender el silencio antes de decidir. La información tiene valor.",
           },
@@ -159,7 +202,6 @@ El silencio de JD y AOC merece investigación, no suposición. Este sitio presen
         en: "Biographical Summary",
         es: "Resumen Biográfico",
       },
-      // Facts are facts - no framing needed
       facts: {
         en: [
           ["Full Name", "Saikat Chakrabarti"],
@@ -201,13 +243,13 @@ El silencio de JD y AOC merece investigación, no suposición. Este sitio presen
 La declaración financiera de 2025 muestra acciones retenidas de Stripe valoradas en mínimo <strong>$50 millones</strong>.`,
         },
         framing: {
-          red: {
-            en: `<p class="framing red">He got rich at Stripe, then left to spend that money on left-wing politics. Now he wants to use that fortune to buy a congressional seat.</p>`,
-            es: `<p class="framing red">Se hizo rico en Stripe, luego se fue para gastar ese dinero en política de izquierda. Ahora quiere usar esa fortuna para comprar un escaño en el Congreso.</p>`,
+          conservative: {
+            en: `He got rich at Stripe, then left to spend that money on left-wing politics. Now he wants to use that fortune to buy a congressional seat.`,
+            es: `Se hizo rico en Stripe, luego se fue para gastar ese dinero en política de izquierda. Ahora quiere usar esa fortuna para comprar un escaño en el Congreso.`,
           },
-          blue: {
-            en: `<p class="framing blue">He walked away from a fortune-in-the-making because he believed politics mattered more than money. His self-funding means no PAC strings attached.</p>`,
-            es: `<p class="framing blue">Se alejó de una fortuna en construcción porque creía que la política importaba más que el dinero. Su autofinanciamiento significa que no hay ataduras de PACs.</p>`,
+          progressive: {
+            en: `He walked away from a fortune-in-the-making because he believed politics mattered more than money. His self-funding means no PAC strings attached.`,
+            es: `Se alejó de una fortuna en construcción porque creía que la política importaba más que el dinero. Su autofinanciamiento significa que no hay ataduras de PACs.`,
           },
         },
         quote: {
@@ -239,13 +281,13 @@ La declaración financiera de 2025 muestra acciones retenidas de Stripe valorada
 </ul>`,
         },
         framing: {
-          red: {
-            en: `<p class="framing red">Helped Sanders lose to Hillary, then blamed Congress for why socialism couldn't work. Classic excuse-making.</p>`,
-            es: `<p class="framing red">Ayudó a Sanders a perder contra Hillary, luego culpó al Congreso de por qué el socialismo no podía funcionar. Excusas clásicas.</p>`,
+          conservative: {
+            en: `Helped Sanders lose to Hillary, then blamed Congress for why socialism couldn't work. Classic excuse-making.`,
+            es: `Ayudó a Sanders a perder contra Hillary, luego culpó al Congreso de por qué el socialismo no podía funcionar. Excusas clásicas.`,
           },
-          blue: {
-            en: `<p class="framing blue">Built the distributed organizing infrastructure that would later power AOC's upset. Learned that presidential change requires congressional change.</p>`,
-            es: `<p class="framing blue">Construyó la infraestructura de organización distribuida que luego impulsaría el triunfo de AOC. Aprendió que el cambio presidencial requiere cambio en el Congreso.</p>`,
+          progressive: {
+            en: `Built the distributed organizing infrastructure that would later power AOC's upset. Learned that presidential change requires congressional change.`,
+            es: `Construyó la infraestructura de organización distribuida que luego impulsaría el triunfo de AOC. Aprendió que el cambio presidencial requiere cambio en el Congreso.`,
           },
         },
         quote: {
@@ -271,13 +313,13 @@ Co-founder Cenk Uygur resigned December 2017 after sexist blog posts surfaced. K
 El co-fundador Cenk Uygur renunció en diciembre 2017 después de que surgieron publicaciones sexistas. Kyle Kulinski se fue al día siguiente en protesta por cómo se manejó.`,
         },
         framing: {
-          red: {
-            en: `<p class="framing red">Created the organization that gave us The Squad—the most divisive Democratic faction in a generation. His co-founders quit over internal dysfunction.</p>`,
-            es: `<p class="framing red">Creó la organización que nos dio The Squad—la facción demócrata más divisiva en una generación. Sus co-fundadores renunciaron por disfunción interna.</p>`,
+          conservative: {
+            en: `Created the organization that gave us The Squad—the most divisive Democratic faction in a generation. His co-founders quit over internal dysfunction.`,
+            es: `Creó la organización que nos dio The Squad—la facción demócrata más divisiva en una generación. Sus co-fundadores renunciaron por disfunción interna.`,
           },
-          blue: {
-            en: `<p class="framing blue">Built the machine that elected the first progressive wave in decades. When problems arose, the organization dealt with them—Uygur was out within 24 hours.</p>`,
-            es: `<p class="framing blue">Construyó la máquina que eligió la primera ola progresista en décadas. Cuando surgieron problemas, la organización los manejó—Uygur estaba fuera en 24 horas.</p>`,
+          progressive: {
+            en: `Built the machine that elected the first progressive wave in decades. When problems arose, the organization dealt with them—Uygur was out within 24 hours.`,
+            es: `Construyó la máquina que eligió la primera ola progresista en décadas. Cuando surgieron problemas, la organización los manejó—Uygur estaba fuera en 24 horas.`,
           },
         },
       },
@@ -296,13 +338,13 @@ Campaign video "The Courage to Change" cost ~$10,000, got millions of views.`,
 El video de campaña "El Coraje para Cambiar" costó ~$10,000, obtuvo millones de vistas.`,
         },
         framing: {
-          red: {
-            en: `<p class="framing red">Engineered the takedown of a senior Democratic leader, replacing experience with inexperience, pragmatism with ideology.</p>`,
-            es: `<p class="framing red">Orquestó la caída de un líder demócrata senior, reemplazando experiencia con inexperiencia, pragmatismo con ideología.</p>`,
+          conservative: {
+            en: `Engineered the takedown of a senior Democratic leader, replacing experience with inexperience, pragmatism with ideology.`,
+            es: `Orquestó la caída de un líder demócrata senior, reemplazando experiencia con inexperiencia, pragmatismo con ideología.`,
           },
-          blue: {
-            en: `<p class="framing blue">Proved that grassroots organizing can beat machine politics. Outspent 18:1 and won by 14 points. The blueprint for progressive insurgency.</p>`,
-            es: `<p class="framing blue">Demostró que la organización de base puede vencer a la política de máquina. Superado en gasto 18:1 y ganó por 14 puntos. El modelo para la insurgencia progresista.</p>`,
+          progressive: {
+            en: `Proved that grassroots organizing can beat machine politics. Outspent 18:1 and won by 14 points. The blueprint for progressive insurgency.`,
+            es: `Demostró que la organización de base puede vencer a la política de máquina. Superado en gasto 18:1 y ganó por 14 puntos. El modelo para la insurgencia progresista.`,
           },
         },
       },
@@ -337,13 +379,13 @@ Departed same day as Communications Director Corbin Trent.`,
 Se fue el mismo día que el Director de Comunicaciones Corbin Trent.`,
         },
         framing: {
-          red: {
-            en: `<p class="framing red">Lasted seven months before his own boss had to let him go. Called fellow Democrats racist, attacked a Native American woman by name, never apologized. This is who he is.</p>`,
-            es: `<p class="framing red">Duró siete meses antes de que su propia jefa tuviera que dejarlo ir. Llamó racistas a compañeros demócratas, atacó a una mujer nativa americana por nombre, nunca se disculpó. Esto es quien él es.</p>`,
+          conservative: {
+            en: `Lasted seven months before his own boss had to let him go. Called fellow Democrats racist, attacked a Native American woman by name, never apologized. This is who he is.`,
+            es: `Duró siete meses antes de que su propia jefa tuviera que dejarlo ir. Llamó racistas a compañeros demócratas, atacó a una mujer nativa americana por nombre, nunca se disculpó. Esto es quien él es.`,
           },
-          blue: {
-            en: `<p class="framing blue">The border vote was real—moderates funded cages. His rhetoric was inflammatory, but the underlying critique had merit. He left to continue GND work outside Congress.</p>`,
-            es: `<p class="framing blue">El voto de la frontera fue real—los moderados financiaron jaulas. Su retórica fue inflamatoria, pero la crítica subyacente tenía mérito. Se fue para continuar el trabajo del GND fuera del Congreso.</p>`,
+          progressive: {
+            en: `The border vote was real—moderates funded cages. His rhetoric was inflammatory, but the underlying critique had merit. He left to continue GND work outside Congress.`,
+            es: `El voto de la frontera fue real—los moderados financiaron jaulas. Su retórica fue inflamatoria, pero la crítica subyacente tenía mérito. Se fue para continuar el trabajo del GND fuera del Congreso.`,
           },
         },
         quote: {
@@ -373,13 +415,13 @@ Se fue el mismo día que el Director de Comunicaciones Corbin Trent.`,
 <strong>Resultado (febrero 2022):</strong> La Comisión quedó empatada <strong>3-3</strong>. Todos los casos desestimados. Sin hallazgo de violación. Sin penalidades.`,
         },
         framing: {
-          red: {
-            en: `<p class="framing red">Designed a complex PAC/LLC structure that created "legitimate transparency concerns" according to campaign finance experts. Escaped on a partisan deadlock, not exoneration.</p>`,
-            es: `<p class="framing red">Diseñó una estructura compleja de PAC/LLC que creó "preocupaciones legítimas de transparencia" según expertos en financiamiento de campañas. Escapó por un empate partidista, no por exoneración.</p>`,
+          conservative: {
+            en: `Designed a complex PAC/LLC structure that created "legitimate transparency concerns" according to campaign finance experts. Escaped on a partisan deadlock, not exoneration.`,
+            es: `Diseñó una estructura compleja de PAC/LLC que creó "preocupaciones legítimas de transparencia" según expertos en financiamiento de campañas. Escapó por un empate partidista, no por exoneración.`,
           },
-          blue: {
-            en: `<p class="framing blue">Conservative hit job. Filed by partisan actors, ended in deadlock that reflected Commission politics, not facts. No wrongdoing found.</p>`,
-            es: `<p class="framing blue">Ataque partidista conservador. Presentado por actores partidistas, terminó en empate que reflejó la política de la Comisión, no los hechos. No se encontró irregularidad.</p>`,
+          progressive: {
+            en: `Conservative hit job. Filed by partisan actors, ended in deadlock that reflected Commission politics, not facts. No wrongdoing found.`,
+            es: `Ataque partidista conservador. Presentado por actores partidistas, terminó en empate que reflejó la política de la Comisión, no los hechos. No se encontró irregularidad.`,
           },
         },
       },
@@ -412,13 +454,13 @@ No New Consensus policy has been adopted by any government entity.`,
 Ninguna política de New Consensus ha sido adoptada por ninguna entidad gubernamental.`,
         },
         framing: {
-          red: {
-            en: `<p class="framing red">His think tank is dying—88% revenue collapse. Zero policy wins. Now he wants to fail upward into Congress.</p>`,
-            es: `<p class="framing red">Su think tank está muriendo—colapso de ingresos del 88%. Cero victorias políticas. Ahora quiere fracasar hacia arriba en el Congreso.</p>`,
+          conservative: {
+            en: `His think tank is dying—88% revenue collapse. Zero policy wins. Now he wants to fail upward into Congress.`,
+            es: `Su think tank está muriendo—colapso de ingresos del 88%. Cero victorias políticas. Ahora quiere fracasar hacia arriba en el Congreso.`,
           },
-          blue: {
-            en: `<p class="framing blue">Think tanks struggle when their champion leaves Congress. The GND framework he built is still the reference point for climate policy ambition.</p>`,
-            es: `<p class="framing blue">Los think tanks luchan cuando su campeón deja el Congreso. El marco del GND que construyó sigue siendo el punto de referencia para la ambición de política climática.</p>`,
+          progressive: {
+            en: `Think tanks struggle when their champion leaves Congress. The GND framework he built is still the reference point for climate policy ambition.`,
+            es: `Los think tanks luchan cuando su campeón deja el Congreso. El marco del GND que construyó sigue siendo el punto de referencia para la ambición de política climática.`,
           },
         },
       },
@@ -453,13 +495,13 @@ Ninguna política de New Consensus ha sido adoptada por ninguna entidad gubernam
 <strong>Oponente principal:</strong> Scott Wiener (Senador Estatal de CA) — $2,800,000 recaudados`,
         },
         framing: {
-          red: {
-            en: `<p class="framing red">83% self-funded. Buying the seat outright. Only $298K from actual voters who believe in him.</p>`,
-            es: `<p class="framing red">83% autofinanciado. Comprando el escaño directamente. Solo $298K de votantes reales que creen en él.</p>`,
+          conservative: {
+            en: `83% self-funded. Buying the seat outright. Only $298K from actual voters who believe in him.`,
+            es: `83% autofinanciado. Comprando el escaño directamente. Solo $298K de votantes reales que creen en él.`,
           },
-          blue: {
-            en: `<p class="framing blue">Zero PAC money—exactly what progressives demand. Self-funding eliminates donor conflicts that compromise other candidates.</p>`,
-            es: `<p class="framing blue">Cero dinero de PAC—exactamente lo que los progresistas exigen. La autofinanciación elimina los conflictos de donantes que comprometen a otros candidatos.</p>`,
+          progressive: {
+            en: `Zero PAC money—exactly what progressives demand. Self-funding eliminates donor conflicts that compromise other candidates.`,
+            es: `Cero dinero de PAC—exactamente lo que los progresistas exigen. La autofinanciación elimina los conflictos de donantes que comprometen a otros candidatos.`,
           },
         },
       },
@@ -502,28 +544,28 @@ Ninguna política de New Consensus ha sido adoptada por ninguna entidad gubernam
 </ul>`,
         },
         framing: {
-          red: {
-            en: `<p class="framing red">The people who know him best won't vouch for him. JD endorsed other California races. AOC has said nothing. This silence speaks volumes.</p>`,
-            es: `<p class="framing red">Las personas que mejor lo conocen no lo respaldan. JD respaldó otras carreras de California. AOC no ha dicho nada. Este silencio dice mucho.</p>`,
+          conservative: {
+            en: `The people who know him best won't vouch for him. JD endorsed other California races. AOC has said nothing. This silence speaks volumes.`,
+            es: `Las personas que mejor lo conocen no lo respaldan. JD respaldó otras carreras de California. AOC no ha dicho nada. Este silencio dice mucho.`,
           },
-          blue: {
-            en: `<p class="framing blue">Institutional progressives often avoid local primaries to preserve relationships. The silence may be strategic, not a quality signal. Worth investigating.</p>`,
-            es: `<p class="framing blue">Los progresistas institucionales a menudo evitan primarias locales para preservar relaciones. El silencio puede ser estratégico, no una señal de calidad. Vale la pena investigar.</p>`,
+          progressive: {
+            en: `Institutional progressives often avoid local primaries to preserve relationships. The silence may be strategic, not a quality signal. Worth investigating.`,
+            es: `Los progresistas institucionales a menudo evitan primarias locales para preservar relaciones. El silencio puede ser estratégico, no una señal de calidad. Vale la pena investigar.`,
           },
         },
       },
     ],
   },
 
-  // Game theory analysis - same math, different interpretation
+  // Game theory analysis
   analysis: {
     headline: {
       en: "Formal Analysis",
       es: "Análisis Formal",
     },
     intro: {
-      en: "Bayesian belief propagation on the endorsement chain. The math is the same regardless of partisan lens—only the interpretation differs.",
-      es: "Propagación de creencias bayesianas en la cadena de respaldo. Las matemáticas son las mismas independientemente del lente partidista—solo la interpretación difiere.",
+      en: "Bayesian belief propagation on the endorsement chain. The math is the same regardless of interpretive lens—only the framing differs.",
+      es: "Propagación de creencias bayesianas en la cadena de respaldo. Las matemáticas son las mismas independientemente del lente interpretativo—solo el encuadre difiere.",
     },
     chain: {
       en: `You ← Friend ← FriendOfFriend → Chakrabarti
@@ -582,11 +624,15 @@ Bernie (ex empleador) -→ [SILENCIO]`,
       },
     },
     conclusion: {
-      red: {
+      balanced: {
+        en: `<strong>Optimal action: INVESTIGATE.</strong> The expected value of gathering more information exceeds the expected value of immediate endorsement by ~12 utils.`,
+        es: `<strong>Acción óptima: INVESTIGAR.</strong> El valor esperado de reunir más información excede el valor esperado del respaldo inmediato por ~12 utils.`,
+      },
+      conservative: {
         en: `<strong>Optimal action: INVESTIGATE.</strong> Don't trust the endorsement chain until you understand why the people who know him best won't vouch for him.`,
         es: `<strong>Acción óptima: INVESTIGAR.</strong> No confíes en la cadena de respaldo hasta que entiendas por qué las personas que mejor lo conocen no lo respaldan.`,
       },
-      blue: {
+      progressive: {
         en: `<strong>Optimal action: INVESTIGATE.</strong> The math favors gathering more information. Specifically: is the JD/AOC silence informative or strategic?`,
         es: `<strong>Acción óptima: INVESTIGAR.</strong> Las matemáticas favorecen reunir más información. Específicamente: ¿el silencio de JD/AOC es informativo o estratégico?`,
       },
@@ -597,7 +643,7 @@ Bernie (ex empleador) -→ [SILENCIO]`,
     },
   },
 
-  // Methodology - same across all views
+  // Methodology
   methodology: {
     headline: {
       en: "Methodology: Nullius in Verba",
@@ -616,17 +662,17 @@ Bernie (ex empleador) -→ [SILENCIO]`,
         },
       },
       {
-        title: { en: "The Four Lenses", es: "Los Cuatro Lentes" },
+        title: { en: "The Three Views", es: "Las Tres Vistas" },
         body: {
-          en: `This site presents the same facts through four partisan/language combinations. The facts don't change—only the framing. This demonstrates that interpretation is separate from evidence.`,
-          es: `Este sitio presenta los mismos hechos a través de cuatro combinaciones partidistas/de idioma. Los hechos no cambian—solo el encuadre. Esto demuestra que la interpretación es separada de la evidencia.`,
+          en: `This site presents the same facts through three lenses: a balanced side-by-side comparison (default), a steelman conservative critique, and a steelman progressive defense. The facts don't change—only the framing.`,
+          es: `Este sitio presenta los mismos hechos a través de tres lentes: una comparación lado a lado balanceada (predeterminada), una crítica conservadora robusta, y una defensa progresista robusta. Los hechos no cambian—solo el encuadre.`,
         },
       },
       {
         title: { en: "Strawman / Steelman", es: "Hombre de Paja / Acero" },
         body: {
-          en: `Red framing is the steelman of conservative criticism. Blue framing is the steelman of progressive defense. A fair-minded reader should engage with both before deciding.`,
-          es: `El encuadre rojo es el acero de la crítica conservadora. El encuadre azul es el acero de la defensa progresista. Un lector justo debería considerar ambos antes de decidir.`,
+          en: `The conservative lens is the steelman of conservative criticism—the strongest version of that argument. The progressive lens is the steelman of progressive defense. A fair-minded reader should engage with both before deciding.`,
+          es: `El lente conservador es el acero de la crítica conservadora—la versión más fuerte de ese argumento. El lente progresista es el acero de la defensa progresista. Un lector justo debería considerar ambos antes de decidir.`,
         },
       },
     ],
@@ -639,8 +685,8 @@ Bernie (ex empleador) -→ [SILENCIO]`,
       es: "No creas en la palabra de nadie.",
     },
     copy: {
-      en: "NULLIUS CHAKRABARTI // 2026 // Verify, don't trust.",
-      es: "NULLIUS CHAKRABARTI // 2026 // Verifica, no confíes.",
+      en: "NULLIUS // 2026 // Verify, don't trust.",
+      es: "NULLIUS // 2026 // Verifica, no confíes.",
     },
   },
 };

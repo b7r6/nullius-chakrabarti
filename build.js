@@ -3,13 +3,14 @@
 /**
  * NULLIUS CHAKRABARTI - Static Site Generator
  *
- * Generates four views:
- * - red/en: Republican framing, English
- * - red/es: Republican framing, Spanish
- * - blue/en: Democratic framing, English
- * - blue/es: Democratic framing, Spanish
+ * Three views:
+ * - balanced: Fair side-by-side comparison (default) - red/white/blue patriotic
+ * - conservative: Steelman conservative critique
+ * - progressive: Steelman progressive defense
  *
- * Tab key cycles through all four.
+ * Two languages: en, es
+ *
+ * Dropdown to switch views, language toggle
  */
 
 import * as fs from "fs";
@@ -18,220 +19,233 @@ import { content } from "./content.js";
 
 const DIST = "./dist";
 
-const VIEWS = [
-  {
-    party: "red",
-    lang: "en",
-    label: "RED / EN",
-    labelFull: "Republican • English",
-  },
-  {
-    party: "red",
-    lang: "es",
-    label: "RED / ES",
-    labelFull: "Republicano • Español",
-  },
-  {
-    party: "blue",
-    lang: "en",
-    label: "BLUE / EN",
-    labelFull: "Democrat • English",
-  },
-  {
-    party: "blue",
-    lang: "es",
-    label: "BLUE / ES",
-    labelFull: "Demócrata • Español",
-  },
-];
+const VIEWS = ["balanced", "conservative", "progressive"];
+const LANGS = ["en", "es"];
 
-// Get text for a given lang/party combo
-function t(obj, lang, party = null) {
+// Get text for a given lang/view combo
+function t(obj, lang, view = null) {
   if (!obj) return "";
   if (typeof obj === "string") return obj;
-  if (party && obj[party]) {
-    return obj[party][lang] || obj[party].en || "";
+  if (view && obj[view]) {
+    return obj[view][lang] || obj[view].en || "";
   }
   return obj[lang] || obj.en || "";
 }
 
-// Generate the tab switcher UI
-function generateTabSwitcher(currentView) {
-  const tabs = VIEWS.map((v, i) => {
-    const isCurrent =
-      v.party === currentView.party && v.lang === currentView.lang;
-    const href = `index-${v.party}-${v.lang}.html`;
-    return `<a href="${href}" class="tab ${v.party} ${isCurrent ? "active" : ""}" data-index="${i}">${v.label}</a>`;
+// Generate the header with view dropdown and language toggle
+function generateHeader(currentView, currentLang, pageName) {
+  const viewOptions = VIEWS.map((v) => {
+    const selected = v === currentView ? "selected" : "";
+    return `<option value="${v}" ${selected}>${content.views[currentLang][v]}</option>`;
   }).join("");
 
+  const otherLang = currentLang === "en" ? "es" : "en";
+  const langLabel = currentLang === "en" ? "ES" : "EN";
+  const langUrl = `${pageName}-${currentView}-${otherLang}.html`;
+
   return `
-    <div class="tab-switcher">
-      <div class="tabs">${tabs}</div>
-      <div class="tab-hint">${currentView.lang === "en" ? "Press TAB to cycle views" : "Presiona TAB para cambiar vistas"}</div>
-    </div>`;
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="header-flag">
+          <span class="flag-stripe red"></span>
+          <span class="flag-stripe white"></span>
+          <span class="flag-stripe blue"></span>
+        </div>
+        <div class="header-controls">
+          <div class="view-selector">
+            <label for="view-select">${currentLang === "en" ? "View" : "Vista"}:</label>
+            <select id="view-select" onchange="switchView(this.value)">
+              ${viewOptions}
+            </select>
+          </div>
+          <a href="${langUrl}" class="lang-toggle">${langLabel}</a>
+        </div>
+      </div>
+    </header>`;
 }
 
-function generateNav(view) {
-  const nav = content.nav[view.lang];
+function generateNav(currentView, currentLang) {
+  const nav = content.nav[currentLang];
   return `
-    <nav class="nav ${view.party}">
+    <nav class="nav ${currentView}">
       <div class="nav-inner">
-        <a href="index-${view.party}-${view.lang}.html" class="nav-logo">NULLIUS</a>
+        <a href="index-${currentView}-${currentLang}.html" class="nav-logo">NULLIUS</a>
         <div class="nav-links">
-          <a href="index-${view.party}-${view.lang}.html" class="nav-link">${nav.home}</a>
-          <a href="biography-${view.party}-${view.lang}.html" class="nav-link">${nav.biography}</a>
-          <a href="analysis-${view.party}-${view.lang}.html" class="nav-link">${nav.analysis}</a>
-          <a href="methodology-${view.party}-${view.lang}.html" class="nav-link">${nav.methodology}</a>
-          <a href="sources-${view.party}-${view.lang}.html" class="nav-link">${nav.sources}</a>
+          <a href="index-${currentView}-${currentLang}.html" class="nav-link">${nav.home}</a>
+          <a href="biography-${currentView}-${currentLang}.html" class="nav-link">${nav.biography}</a>
+          <a href="analysis-${currentView}-${currentLang}.html" class="nav-link">${nav.analysis}</a>
+          <a href="methodology-${currentView}-${currentLang}.html" class="nav-link">${nav.methodology}</a>
+          <a href="sources-${currentView}-${currentLang}.html" class="nav-link">${nav.sources}</a>
           <a href="https://github.com/b7r6/chakrabarti-game" class="nav-link nav-link-external" target="_blank">${nav.github}</a>
         </div>
       </div>
     </nav>`;
 }
 
-function generateFooter(view) {
+function generateFooter(currentView, currentLang) {
   return `
-    <footer class="footer ${view.party}">
+    <footer class="footer ${currentView}">
       <div class="footer-inner">
-        <p class="footer-tagline">${t(content.footer.tagline, view.lang)}</p>
+        <p class="footer-tagline">${t(content.footer.tagline, currentLang)}</p>
         <div class="footer-links">
-          <a href="methodology-${view.party}-${view.lang}.html" class="footer-link">${content.nav[view.lang].methodology}</a>
-          <a href="sources-${view.party}-${view.lang}.html" class="footer-link">${content.nav[view.lang].sources}</a>
+          <a href="methodology-${currentView}-${currentLang}.html" class="footer-link">${content.nav[currentLang].methodology}</a>
+          <a href="sources-${currentView}-${currentLang}.html" class="footer-link">${content.nav[currentLang].sources}</a>
           <a href="https://github.com/b7r6/chakrabarti-game" class="footer-link" target="_blank">GitHub</a>
         </div>
-        <p class="footer-copy">${t(content.footer.copy, view.lang)}</p>
+        <p class="footer-copy">${t(content.footer.copy, currentLang)}</p>
       </div>
     </footer>`;
 }
 
-function generateTabScript() {
-  const viewUrls = JSON.stringify(
-    VIEWS.map((v) => `index-${v.party}-${v.lang}.html`),
-  );
+function generateViewScript(currentLang, pageName) {
   return `
     <script>
-      const views = ${viewUrls};
-      let currentIndex = views.findIndex(v => window.location.pathname.endsWith(v)) || 0;
-      
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Tab' && !e.target.matches('input, textarea')) {
-          e.preventDefault();
-          currentIndex = (currentIndex + (e.shiftKey ? -1 : 1) + views.length) % views.length;
-          window.location.href = views[currentIndex];
-        }
-      });
+      function switchView(view) {
+        const lang = '${currentLang}';
+        const page = '${pageName}';
+        window.location.href = page + '-' + view + '-' + lang + '.html';
+      }
     </script>`;
 }
 
-function generatePage(title, bodyContent, view, pageClass = "") {
+function generatePage(
+  title,
+  bodyContent,
+  currentView,
+  currentLang,
+  pageName,
+  pageClass = "",
+) {
   return `<!DOCTYPE html>
-<html lang="${view.lang}">
+<html lang="${currentLang}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title} — Nullius Chakrabarti</title>
+  <title>${title} — Nullius</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="site ${view.party} ${pageClass}">
-  ${generateTabSwitcher(view)}
-  ${generateNav(view)}
+<body class="site ${currentView} ${pageClass}">
+  ${generateHeader(currentView, currentLang, pageName)}
+  ${generateNav(currentView, currentLang)}
   <main class="main">
     ${bodyContent}
   </main>
-  ${generateFooter(view)}
-  ${generateTabScript()}
+  ${generateFooter(currentView, currentLang)}
+  ${generateViewScript(currentLang, pageName)}
 </body>
 </html>`;
 }
 
 // Page generators
 
-function generateHomePage(view) {
+function generateHomePage(view, lang) {
   const findings = content.findings.items
     .map(
       (f) => `
     <div class="finding-card">
       <div class="finding-stat">${f.stat}</div>
-      <div class="finding-label">${t(f.label, view.lang)}</div>
-      <div class="finding-context">${t(f.context, view.lang, view.party)}</div>
+      <div class="finding-label">${t(f.label, lang)}</div>
+      <div class="finding-context">${t(f.context, lang, view)}</div>
     </div>
   `,
     )
     .join("");
 
   const body = `
-    <section class="hero ${view.party}">
+    <section class="hero ${view}">
       <div class="hero-inner">
-        <h1 class="hero-headline">${t(content.hero.headline, view.lang)}</h1>
-        <p class="hero-subhead">${t(content.hero.subhead, view.lang, view.party)}</p>
-        <p class="hero-tagline">${t(content.hero.tagline, view.lang)}</p>
-        <a href="analysis-${view.party}-${view.lang}.html" class="btn btn-primary btn-large">${view.lang === "en" ? "See the Analysis" : "Ver el Análisis"}</a>
+        <h1 class="hero-headline">${t(content.hero.headline, lang)}</h1>
+        <p class="hero-subhead">${t(content.hero.subhead, lang, view)}</p>
+        <p class="hero-tagline">${t(content.hero.tagline, lang)}</p>
+        <a href="analysis-${view}-${lang}.html" class="btn btn-primary btn-large">${lang === "en" ? "See the Analysis" : "Ver el Análisis"}</a>
       </div>
     </section>
     
     <section class="section section-question">
       <div class="section-inner">
-        <h2 class="section-headline">${t(content.question.headline, view.lang)}</h2>
-        <div class="section-body">${t(content.question.body, view.lang, view.party)}</div>
+        <h2 class="section-headline">${t(content.question.headline, lang)}</h2>
+        <div class="section-body">${t(content.question.body, lang, view)}</div>
       </div>
     </section>
     
-    <section class="section section-findings ${view.party}">
+    <section class="section section-findings ${view}">
       <div class="section-inner">
-        <h2 class="section-headline">${t(content.findings.headline, view.lang)}</h2>
+        <h2 class="section-headline">${t(content.findings.headline, lang)}</h2>
         <div class="findings-grid">
           ${findings}
         </div>
       </div>
     </section>
     
-    <section class="section section-cta ${view.party}">
+    <section class="section section-cta ${view}">
       <div class="section-inner">
-        <p class="cta-text">${view.lang === "en" ? "Every claim is cited. Every calculation is shown. Verify independently." : "Cada afirmación está citada. Cada cálculo se muestra. Verifica independientemente."}</p>
-        <a href="sources-${view.party}-${view.lang}.html" class="btn btn-secondary">${view.lang === "en" ? "View All Sources" : "Ver Todas las Fuentes"}</a>
+        <p class="cta-text">${lang === "en" ? "Every claim is cited. Every calculation is shown. Verify independently." : "Cada afirmación está citada. Cada cálculo se muestra. Verifica independientemente."}</p>
+        <a href="sources-${view}-${lang}.html" class="btn btn-secondary">${lang === "en" ? "View All Sources" : "Ver Todas las Fuentes"}</a>
       </div>
     </section>
   `;
 
   return generatePage(
-    view.lang === "en" ? "Home" : "Inicio",
+    lang === "en" ? "Home" : "Inicio",
     body,
     view,
+    lang,
+    "index",
     "page-home",
   );
 }
 
-function generateBiographyPage(view) {
-  const summaryRows = content.bio.summary.facts[view.lang]
+function generateBiographyPage(view, lang) {
+  const summaryRows = content.bio.summary.facts[lang]
     .map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`)
     .join("");
 
   const sections = content.bio.sections
-    .map(
-      (s) => `
+    .map((s) => {
+      // For balanced view, show both framings side by side
+      let framingHtml = "";
+      if (s.framing) {
+        if (view === "balanced") {
+          framingHtml = `
+            <div class="framing-comparison">
+              <div class="framing-side conservative">
+                <div class="framing-label">${lang === "en" ? "Conservative View" : "Vista Conservadora"}</div>
+                <p class="framing-text">${t(s.framing.conservative, lang)}</p>
+              </div>
+              <div class="framing-side progressive">
+                <div class="framing-label">${lang === "en" ? "Progressive View" : "Vista Progresista"}</div>
+                <p class="framing-text">${t(s.framing.progressive, lang)}</p>
+              </div>
+            </div>`;
+        } else {
+          framingHtml = `<p class="framing ${view}">${t(s.framing, lang, view)}</p>`;
+        }
+      }
+
+      return `
     <div class="bio-section" id="${s.id}">
-      <h2 class="bio-section-title">${t(s.title, view.lang)}</h2>
-      <div class="bio-section-facts">${t(s.facts, view.lang)}</div>
-      ${s.framing ? t(s.framing, view.lang, view.party) : ""}
+      <h2 class="bio-section-title">${t(s.title, lang)}</h2>
+      <div class="bio-section-facts">${t(s.facts, lang)}</div>
+      ${framingHtml}
       ${
         s.quote
           ? `
         <blockquote class="bio-quote">
-          ${t(s.quote.text, view.lang)}
+          ${t(s.quote.text, lang)}
           <cite>— ${s.quote.cite}</cite>
         </blockquote>
       `
           : ""
       }
     </div>
-  `,
-    )
+  `;
+    })
     .join("");
 
   const body = `
-    <section class="section-hero-small ${view.party}">
+    <section class="section-hero-small ${view}">
       <div class="section-inner">
-        <h1 class="page-headline">${t(content.bio.summary.headline, view.lang)}</h1>
+        <h1 class="page-headline">${t(content.bio.summary.headline, lang)}</h1>
       </div>
     </section>
     
@@ -251,72 +265,91 @@ function generateBiographyPage(view) {
   `;
 
   return generatePage(
-    view.lang === "en" ? "Biography" : "Biografía",
+    lang === "en" ? "Biography" : "Biografía",
     body,
     view,
+    lang,
+    "biography",
     "page-biography",
   );
 }
 
-function generateAnalysisPage(view) {
-  const bayesRows = content.analysis.bayesTable.rows[view.lang]
+function generateAnalysisPage(view, lang) {
+  const bayesRows = content.analysis.bayesTable.rows[lang]
     .map((row, i) => {
       const cls =
-        i === content.analysis.bayesTable.rows[view.lang].length - 1
-          ? "final"
-          : "";
+        i === content.analysis.bayesTable.rows[lang].length - 1 ? "final" : "";
       return `<tr class="${cls}"><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td></tr>`;
     })
     .join("");
 
-  const decisionRows = content.analysis.decision.rows[view.lang]
+  const decisionRows = content.analysis.decision.rows[lang]
     .map((row, i) => {
       const cls = i === 2 ? "optimal" : "";
       return `<tr class="${cls}"><td>${row[0]}</td><td>${row[1]}</td></tr>`;
     })
     .join("");
 
+  // For balanced view, show both conclusions
+  let conclusionHtml = "";
+  if (view === "balanced") {
+    conclusionHtml = `
+      <div class="conclusion balanced">${t(content.analysis.conclusion, lang, "balanced")}</div>
+      <div class="framing-comparison conclusion-comparison">
+        <div class="framing-side conservative">
+          <div class="framing-label">${lang === "en" ? "Conservative Interpretation" : "Interpretación Conservadora"}</div>
+          <p class="framing-text">${t(content.analysis.conclusion.conservative, lang)}</p>
+        </div>
+        <div class="framing-side progressive">
+          <div class="framing-label">${lang === "en" ? "Progressive Interpretation" : "Interpretación Progresista"}</div>
+          <p class="framing-text">${t(content.analysis.conclusion.progressive, lang)}</p>
+        </div>
+      </div>`;
+  } else {
+    conclusionHtml = `<div class="conclusion ${view}">${t(content.analysis.conclusion, lang, view)}</div>`;
+  }
+
   const body = `
-    <section class="section-hero-small ${view.party}">
+    <section class="section-hero-small ${view}">
       <div class="section-inner">
-        <h1 class="page-headline">${t(content.analysis.headline, view.lang)}</h1>
-        <p class="page-intro">${t(content.analysis.intro, view.lang)}</p>
+        <h1 class="page-headline">${t(content.analysis.headline, lang)}</h1>
+        <p class="page-intro">${t(content.analysis.intro, lang)}</p>
       </div>
     </section>
     
     <section class="section section-analysis">
       <div class="section-inner">
         <div class="analysis-section">
-          <h2 class="analysis-section-title">${view.lang === "en" ? "1. The Endorsement Chain" : "1. La Cadena de Respaldo"}</h2>
-          <pre class="chain-diagram">${t(content.analysis.chain, view.lang)}</pre>
+          <h2 class="analysis-section-title">${lang === "en" ? "1. The Endorsement Chain" : "1. La Cadena de Respaldo"}</h2>
+          <pre class="chain-diagram">${t(content.analysis.chain, lang)}</pre>
         </div>
         
         <div class="analysis-section">
-          <h2 class="analysis-section-title">${view.lang === "en" ? "2. Bayesian Belief Propagation" : "2. Propagación de Creencias Bayesianas"}</h2>
+          <h2 class="analysis-section-title">${lang === "en" ? "2. Bayesian Belief Propagation" : "2. Propagación de Creencias Bayesianas"}</h2>
           <table class="bayes-table">
             <thead>
-              <tr>${content.analysis.bayesTable.header[view.lang].map((h) => `<th>${h}</th>`).join("")}</tr>
+              <tr>${content.analysis.bayesTable.header[lang].map((h) => `<th>${h}</th>`).join("")}</tr>
             </thead>
             <tbody>${bayesRows}</tbody>
           </table>
         </div>
         
         <div class="analysis-section">
-          <h2 class="analysis-section-title">${view.lang === "en" ? "3. Decision Analysis" : "3. Análisis de Decisión"}</h2>
+          <h2 class="analysis-section-title">${lang === "en" ? "3. Decision Analysis" : "3. Análisis de Decisión"}</h2>
           <table class="decision-table">
             <thead>
-              <tr>${content.analysis.decision.header[view.lang].map((h) => `<th>${h}</th>`).join("")}</tr>
+              <tr>${content.analysis.decision.header[lang].map((h) => `<th>${h}</th>`).join("")}</tr>
             </thead>
             <tbody>${decisionRows}</tbody>
           </table>
-          <div class="conclusion ${view.party}">${t(content.analysis.conclusion, view.lang, view.party)}</div>
+          ${conclusionHtml}
         </div>
         
         <div class="analysis-section">
-          <h2 class="analysis-section-title">${view.lang === "en" ? "4. The Meta-Question" : "4. La Meta-Pregunta"}</h2>
-          <blockquote class="key-question">${t(content.analysis.metaQuestion, view.lang)}</blockquote>
+          <h2 class="analysis-section-title">${lang === "en" ? "4. The Meta-Question" : "4. La Meta-Pregunta"}</h2>
+          <blockquote class="key-question">${t(content.analysis.metaQuestion, lang)}</blockquote>
           <p>${
-            view.lang === "en"
+            lang === "en"
               ? "If strategic (not informative), EV(endorse) jumps from +11 to +38. The value of answering this question: ~13.5 utils."
               : "Si es estratégico (no informativo), VE(respaldar) salta de +11 a +38. El valor de responder esta pregunta: ~13.5 utils."
           }</p>
@@ -324,40 +357,42 @@ function generateAnalysisPage(view) {
       </div>
     </section>
     
-    <section class="section section-github-cta ${view.party}">
+    <section class="section section-github-cta ${view}">
       <div class="section-inner">
-        <h3>${view.lang === "en" ? "Full Lean4 Formalization" : "Formalización Completa en Lean4"}</h3>
-        <p>${view.lang === "en" ? "The proofs type-check." : "Las pruebas verifican tipos."}</p>
+        <h3>${lang === "en" ? "Full Lean4 Formalization" : "Formalización Completa en Lean4"}</h3>
+        <p>${lang === "en" ? "The proofs type-check." : "Las pruebas verifican tipos."}</p>
         <a href="https://github.com/b7r6/chakrabarti-game" class="btn btn-primary" target="_blank">GitHub</a>
       </div>
     </section>
   `;
 
   return generatePage(
-    view.lang === "en" ? "Analysis" : "Análisis",
+    lang === "en" ? "Analysis" : "Análisis",
     body,
     view,
+    lang,
+    "analysis",
     "page-analysis",
   );
 }
 
-function generateMethodologyPage(view) {
+function generateMethodologyPage(view, lang) {
   const sections = content.methodology.sections
     .map(
       (s) => `
     <div class="methodology-section">
-      <h2 class="methodology-section-title">${t(s.title, view.lang)}</h2>
-      <div class="methodology-section-body">${t(s.body, view.lang)}</div>
+      <h2 class="methodology-section-title">${t(s.title, lang)}</h2>
+      <div class="methodology-section-body">${t(s.body, lang)}</div>
     </div>
   `,
     )
     .join("");
 
   const body = `
-    <section class="section-hero-small ${view.party}">
+    <section class="section-hero-small ${view}">
       <div class="section-inner">
-        <h1 class="page-headline">${t(content.methodology.headline, view.lang)}</h1>
-        <p class="page-intro">${t(content.methodology.intro, view.lang)}</p>
+        <h1 class="page-headline">${t(content.methodology.headline, lang)}</h1>
+        <p class="page-intro">${t(content.methodology.intro, lang)}</p>
       </div>
     </section>
     
@@ -369,14 +404,16 @@ function generateMethodologyPage(view) {
   `;
 
   return generatePage(
-    view.lang === "en" ? "Methodology" : "Metodología",
+    lang === "en" ? "Methodology" : "Metodología",
     body,
     view,
+    lang,
+    "methodology",
     "page-methodology",
   );
 }
 
-function generateSourcesPage(view) {
+function generateSourcesPage(view, lang) {
   const categories = [
     {
       title: { en: "FEC Filings", es: "Documentos de la FEC" },
@@ -445,7 +482,7 @@ function generateSourcesPage(view) {
     .map(
       (cat) => `
     <div class="sources-category">
-      <h2 class="sources-category-title">${t(cat.title, view.lang)}</h2>
+      <h2 class="sources-category-title">${t(cat.title, lang)}</h2>
       <ul class="sources-list">
         ${cat.items.map((item) => `<li><a href="${item.url}" target="_blank">${item.text}</a></li>`).join("")}
       </ul>
@@ -455,11 +492,11 @@ function generateSourcesPage(view) {
     .join("");
 
   const body = `
-    <section class="section-hero-small ${view.party}">
+    <section class="section-hero-small ${view}">
       <div class="section-inner">
-        <h1 class="page-headline">${view.lang === "en" ? "Sources" : "Fuentes"}</h1>
+        <h1 class="page-headline">${lang === "en" ? "Sources" : "Fuentes"}</h1>
         <p class="page-intro">${
-          view.lang === "en"
+          lang === "en"
             ? "Every factual claim is cited. Primary sources preferred. Verify independently."
             : "Cada afirmación factual está citada. Fuentes primarias preferidas. Verifica independientemente."
         }</p>
@@ -474,9 +511,11 @@ function generateSourcesPage(view) {
   `;
 
   return generatePage(
-    view.lang === "en" ? "Sources" : "Fuentes",
+    lang === "en" ? "Sources" : "Fuentes",
     body,
     view,
+    lang,
+    "sources",
     "page-sources",
   );
 }
@@ -489,36 +528,31 @@ function build() {
   }
   fs.mkdirSync(DIST, { recursive: true });
 
-  // Generate pages for each view
+  const pages = ["index", "biography", "analysis", "methodology", "sources"];
+  const generators = {
+    index: generateHomePage,
+    biography: generateBiographyPage,
+    analysis: generateAnalysisPage,
+    methodology: generateMethodologyPage,
+    sources: generateSourcesPage,
+  };
+
+  // Generate pages for each view/lang combo
   for (const view of VIEWS) {
-    const suffix = `${view.party}-${view.lang}`;
-    fs.writeFileSync(
-      path.join(DIST, `index-${suffix}.html`),
-      generateHomePage(view),
-    );
-    fs.writeFileSync(
-      path.join(DIST, `biography-${suffix}.html`),
-      generateBiographyPage(view),
-    );
-    fs.writeFileSync(
-      path.join(DIST, `analysis-${suffix}.html`),
-      generateAnalysisPage(view),
-    );
-    fs.writeFileSync(
-      path.join(DIST, `methodology-${suffix}.html`),
-      generateMethodologyPage(view),
-    );
-    fs.writeFileSync(
-      path.join(DIST, `sources-${suffix}.html`),
-      generateSourcesPage(view),
-    );
+    for (const lang of LANGS) {
+      for (const page of pages) {
+        const filename = `${page}-${view}-${lang}.html`;
+        const html = generators[page](view, lang);
+        fs.writeFileSync(path.join(DIST, filename), html);
+      }
+    }
   }
 
-  // Default index redirects to red/en
+  // Default index redirects to balanced/en
   fs.writeFileSync(
     path.join(DIST, "index.html"),
     `<!DOCTYPE html>
-<html><head><meta http-equiv="refresh" content="0; url=index-red-en.html"></head></html>`,
+<html><head><meta http-equiv="refresh" content="0; url=index-balanced-en.html"></head></html>`,
   );
 
   // Copy CSS
@@ -526,7 +560,9 @@ function build() {
     fs.copyFileSync("./static/style.css", path.join(DIST, "style.css"));
   }
 
-  console.log("Built to ./dist (4 views × 5 pages = 20 pages)");
+  console.log(
+    `Built to ./dist (${VIEWS.length} views × ${LANGS.length} langs × ${pages.length} pages = ${VIEWS.length * LANGS.length * pages.length} pages)`,
+  );
 }
 
 build();
