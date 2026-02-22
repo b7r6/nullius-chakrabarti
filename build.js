@@ -3,14 +3,11 @@
 /**
  * NULLIUS CHAKRABARTI - Static Site Generator
  *
- * Three views:
- * - balanced: Fair side-by-side comparison (default) - red/white/blue patriotic
- * - conservative: Steelman conservative critique
- * - progressive: Steelman progressive defense
+ * 2×3 Matrix Framework:
+ * - Rows: Conservative, Progressive
+ * - Columns: Strawman, Steelman, Reasonable Man
  *
- * Two languages: en, es
- *
- * Dropdown to switch views, language toggle
+ * Single view with all perspectives shown. Language toggle (EN/ES).
  */
 
 import * as fs from "fs";
@@ -18,30 +15,18 @@ import * as path from "path";
 import { content } from "./content.js";
 
 const DIST = "./dist";
-
-const VIEWS = ["balanced", "conservative", "progressive"];
 const LANGS = ["en", "es"];
 
-// Get text for a given lang/view combo
-function t(obj, lang, view = null) {
+function t(obj, lang) {
   if (!obj) return "";
   if (typeof obj === "string") return obj;
-  if (view && obj[view]) {
-    return obj[view][lang] || obj[view].en || "";
-  }
   return obj[lang] || obj.en || "";
 }
 
-// Generate the header with view dropdown and language toggle
-function generateHeader(currentView, currentLang, pageName) {
-  const viewOptions = VIEWS.map((v) => {
-    const selected = v === currentView ? "selected" : "";
-    return `<option value="${v}" ${selected}>${content.views[currentLang][v]}</option>`;
-  }).join("");
-
-  const otherLang = currentLang === "en" ? "es" : "en";
-  const langLabel = currentLang === "en" ? "ES" : "EN";
-  const langUrl = `${pageName}-${currentView}-${otherLang}.html`;
+function generateHeader(lang, pageName) {
+  const otherLang = lang === "en" ? "es" : "en";
+  const langLabel = lang === "en" ? "ES" : "EN";
+  const langUrl = `${pageName}-${otherLang}.html`;
 
   return `
     <header class="site-header">
@@ -51,136 +36,144 @@ function generateHeader(currentView, currentLang, pageName) {
           <span class="flag-stripe white"></span>
           <span class="flag-stripe blue"></span>
         </div>
+        <div class="header-title">NULLIUS IN VERBA</div>
         <div class="header-controls">
-          <div class="view-selector">
-            <label for="view-select">${currentLang === "en" ? "View" : "Vista"}:</label>
-            <select id="view-select" onchange="switchView(this.value)">
-              ${viewOptions}
-            </select>
-          </div>
           <a href="${langUrl}" class="lang-toggle">${langLabel}</a>
         </div>
       </div>
     </header>`;
 }
 
-function generateNav(currentView, currentLang) {
-  const nav = content.nav[currentLang];
+function generateNav(lang) {
+  const nav = content.nav[lang];
   return `
-    <nav class="nav ${currentView}">
+    <nav class="nav">
       <div class="nav-inner">
-        <a href="index-${currentView}-${currentLang}.html" class="nav-logo">NULLIUS</a>
+        <a href="index-${lang}.html" class="nav-logo">NULLIUS</a>
         <div class="nav-links">
-          <a href="index-${currentView}-${currentLang}.html" class="nav-link">${nav.home}</a>
-          <a href="biography-${currentView}-${currentLang}.html" class="nav-link">${nav.biography}</a>
-          <a href="analysis-${currentView}-${currentLang}.html" class="nav-link">${nav.analysis}</a>
-          <a href="methodology-${currentView}-${currentLang}.html" class="nav-link">${nav.methodology}</a>
-          <a href="sources-${currentView}-${currentLang}.html" class="nav-link">${nav.sources}</a>
+          <a href="index-${lang}.html" class="nav-link">${nav.home}</a>
+          <a href="biography-${lang}.html" class="nav-link">${nav.biography}</a>
+          <a href="analysis-${lang}.html" class="nav-link">${nav.analysis}</a>
+          <a href="methodology-${lang}.html" class="nav-link">${nav.methodology}</a>
+          <a href="sources-${lang}.html" class="nav-link">${nav.sources}</a>
           <a href="https://github.com/b7r6/chakrabarti-game" class="nav-link nav-link-external" target="_blank">${nav.github}</a>
         </div>
       </div>
     </nav>`;
 }
 
-function generateFooter(currentView, currentLang) {
+function generateFooter(lang) {
   return `
-    <footer class="footer ${currentView}">
+    <footer class="footer">
       <div class="footer-inner">
-        <p class="footer-tagline">${t(content.footer.tagline, currentLang)}</p>
+        <p class="footer-tagline">${t(content.footer.tagline, lang)}</p>
         <div class="footer-links">
-          <a href="methodology-${currentView}-${currentLang}.html" class="footer-link">${content.nav[currentLang].methodology}</a>
-          <a href="sources-${currentView}-${currentLang}.html" class="footer-link">${content.nav[currentLang].sources}</a>
+          <a href="methodology-${lang}.html" class="footer-link">${content.nav[lang].methodology}</a>
+          <a href="sources-${lang}.html" class="footer-link">${content.nav[lang].sources}</a>
           <a href="https://github.com/b7r6/chakrabarti-game" class="footer-link" target="_blank">GitHub</a>
         </div>
-        <p class="footer-copy">${t(content.footer.copy, currentLang)}</p>
+        <p class="footer-copy">${t(content.footer.copy, lang)}</p>
       </div>
     </footer>`;
 }
 
-function generateViewScript(currentLang, pageName) {
-  return `
-    <script>
-      function switchView(view) {
-        const lang = '${currentLang}';
-        const page = '${pageName}';
-        window.location.href = page + '-' + view + '-' + lang + '.html';
-      }
-    </script>`;
-}
-
-function generatePage(
-  title,
-  bodyContent,
-  currentView,
-  currentLang,
-  pageName,
-  pageClass = "",
-) {
+function generatePage(title, bodyContent, lang, pageName, pageClass = "") {
   return `<!DOCTYPE html>
-<html lang="${currentLang}">
+<html lang="${lang}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title} — Nullius</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="site ${currentView} ${pageClass}">
-  ${generateHeader(currentView, currentLang, pageName)}
-  ${generateNav(currentView, currentLang)}
+<body class="site ${pageClass}">
+  ${generateHeader(lang, pageName)}
+  ${generateNav(lang)}
   <main class="main">
     ${bodyContent}
   </main>
-  ${generateFooter(currentView, currentLang)}
-  ${generateViewScript(currentLang, pageName)}
+  ${generateFooter(lang)}
 </body>
 </html>`;
 }
 
-// Page generators
+function generateMatrix(claim, lang) {
+  const cols = content.matrix.columns[lang];
+  const rows = content.matrix.rows[lang];
 
-function generateHomePage(view, lang) {
-  const findings = content.findings.items
-    .map(
-      (f) => `
-    <div class="finding-card">
-      <div class="finding-stat">${f.stat}</div>
-      <div class="finding-label">${t(f.label, lang)}</div>
-      <div class="finding-context">${t(f.context, lang, view)}</div>
-    </div>
-  `,
-    )
+  return `
+    <div class="claim-card" id="${claim.id}">
+      <div class="claim-fact">
+        <div class="claim-fact-label">${lang === "en" ? "THE FACT" : "EL HECHO"}</div>
+        <div class="claim-fact-text">${t(claim.fact, lang)}</div>
+        <div class="claim-fact-source">${lang === "en" ? "Source" : "Fuente"}: ${claim.source}</div>
+      </div>
+      
+      <div class="matrix">
+        <div class="matrix-header">
+          <div class="matrix-corner"></div>
+          <div class="matrix-col-header strawman">${cols[0]}</div>
+          <div class="matrix-col-header steelman">${cols[1]}</div>
+          <div class="matrix-col-header reasonable">${cols[2]}</div>
+        </div>
+        
+        <div class="matrix-row conservative">
+          <div class="matrix-row-header">${rows[0]}</div>
+          <div class="matrix-cell strawman">${t(claim.matrix.conservative.strawman, lang)}</div>
+          <div class="matrix-cell steelman">${t(claim.matrix.conservative.steelman, lang)}</div>
+          <div class="matrix-cell reasonable">${t(claim.matrix.conservative.reasonable, lang)}</div>
+        </div>
+        
+        <div class="matrix-row progressive">
+          <div class="matrix-row-header">${rows[1]}</div>
+          <div class="matrix-cell strawman">${t(claim.matrix.progressive.strawman, lang)}</div>
+          <div class="matrix-cell steelman">${t(claim.matrix.progressive.steelman, lang)}</div>
+          <div class="matrix-cell reasonable">${t(claim.matrix.progressive.reasonable, lang)}</div>
+        </div>
+      </div>
+      
+      <div class="convergence">
+        <div class="convergence-label">${lang === "en" ? "CONVERGENCE" : "CONVERGENCIA"}</div>
+        <div class="convergence-text">${t(claim.matrix.convergence, lang)}</div>
+      </div>
+    </div>`;
+}
+
+function generateHomePage(lang) {
+  const claimsHtml = content.claims
+    .map((c) => generateMatrix(c, lang))
     .join("");
 
   const body = `
-    <section class="hero ${view}">
+    <section class="hero">
       <div class="hero-inner">
         <h1 class="hero-headline">${t(content.hero.headline, lang)}</h1>
-        <p class="hero-subhead">${t(content.hero.subhead, lang, view)}</p>
+        <p class="hero-subhead">${t(content.hero.subhead, lang)}</p>
         <p class="hero-tagline">${t(content.hero.tagline, lang)}</p>
-        <a href="analysis-${view}-${lang}.html" class="btn btn-primary btn-large">${lang === "en" ? "See the Analysis" : "Ver el Análisis"}</a>
+        <a href="analysis-${lang}.html" class="btn btn-primary btn-large">${lang === "en" ? "See the Analysis" : "Ver el Análisis"}</a>
       </div>
     </section>
     
-    <section class="section section-question">
+    <section class="section section-intro">
       <div class="section-inner">
-        <h2 class="section-headline">${t(content.question.headline, lang)}</h2>
-        <div class="section-body">${t(content.question.body, lang, view)}</div>
+        <h2 class="section-headline">${t(content.intro.headline, lang)}</h2>
+        <div class="section-body">${t(content.intro.body, lang)}</div>
       </div>
     </section>
     
-    <section class="section section-findings ${view}">
+    <section class="section section-claims">
       <div class="section-inner">
-        <h2 class="section-headline">${t(content.findings.headline, lang)}</h2>
-        <div class="findings-grid">
-          ${findings}
+        <h2 class="section-headline">${lang === "en" ? "The Evidence" : "La Evidencia"}</h2>
+        <div class="claims-grid">
+          ${claimsHtml}
         </div>
       </div>
     </section>
     
-    <section class="section section-cta ${view}">
+    <section class="section section-cta">
       <div class="section-inner">
         <p class="cta-text">${lang === "en" ? "Every claim is cited. Every calculation is shown. Verify independently." : "Cada afirmación está citada. Cada cálculo se muestra. Verifica independientemente."}</p>
-        <a href="sources-${view}-${lang}.html" class="btn btn-secondary">${lang === "en" ? "View All Sources" : "Ver Todas las Fuentes"}</a>
+        <a href="sources-${lang}.html" class="btn btn-secondary">${lang === "en" ? "View All Sources" : "Ver Todas las Fuentes"}</a>
       </div>
     </section>
   `;
@@ -188,62 +181,24 @@ function generateHomePage(view, lang) {
   return generatePage(
     lang === "en" ? "Home" : "Inicio",
     body,
-    view,
     lang,
     "index",
     "page-home",
   );
 }
 
-function generateBiographyPage(view, lang) {
+function generateBiographyPage(lang) {
   const summaryRows = content.bio.summary.facts[lang]
     .map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`)
     .join("");
 
-  const sections = content.bio.sections
-    .map((s) => {
-      // For balanced view, show both framings side by side
-      let framingHtml = "";
-      if (s.framing) {
-        if (view === "balanced") {
-          framingHtml = `
-            <div class="framing-comparison">
-              <div class="framing-side conservative">
-                <div class="framing-label">${lang === "en" ? "Conservative View" : "Vista Conservadora"}</div>
-                <p class="framing-text">${t(s.framing.conservative, lang)}</p>
-              </div>
-              <div class="framing-side progressive">
-                <div class="framing-label">${lang === "en" ? "Progressive View" : "Vista Progresista"}</div>
-                <p class="framing-text">${t(s.framing.progressive, lang)}</p>
-              </div>
-            </div>`;
-        } else {
-          framingHtml = `<p class="framing ${view}">${t(s.framing, lang, view)}</p>`;
-        }
-      }
-
-      return `
-    <div class="bio-section" id="${s.id}">
-      <h2 class="bio-section-title">${t(s.title, lang)}</h2>
-      <div class="bio-section-facts">${t(s.facts, lang)}</div>
-      ${framingHtml}
-      ${
-        s.quote
-          ? `
-        <blockquote class="bio-quote">
-          ${t(s.quote.text, lang)}
-          <cite>— ${s.quote.cite}</cite>
-        </blockquote>
-      `
-          : ""
-      }
-    </div>
-  `;
-    })
+  // Show claims as matrices on biography page too
+  const claimsHtml = content.claims
+    .map((c) => generateMatrix(c, lang))
     .join("");
 
   const body = `
-    <section class="section-hero-small ${view}">
+    <section class="section-hero-small">
       <div class="section-inner">
         <h1 class="page-headline">${t(content.bio.summary.headline, lang)}</h1>
       </div>
@@ -257,9 +212,12 @@ function generateBiographyPage(view, lang) {
       </div>
     </section>
     
-    <section class="section section-biography">
+    <section class="section section-claims">
       <div class="section-inner">
-        ${sections}
+        <h2 class="section-headline">${lang === "en" ? "Key Claims Examined" : "Afirmaciones Clave Examinadas"}</h2>
+        <div class="claims-grid">
+          ${claimsHtml}
+        </div>
       </div>
     </section>
   `;
@@ -267,14 +225,13 @@ function generateBiographyPage(view, lang) {
   return generatePage(
     lang === "en" ? "Biography" : "Biografía",
     body,
-    view,
     lang,
     "biography",
     "page-biography",
   );
 }
 
-function generateAnalysisPage(view, lang) {
+function generateAnalysisPage(lang) {
   const bayesRows = content.analysis.bayesTable.rows[lang]
     .map((row, i) => {
       const cls =
@@ -290,27 +247,8 @@ function generateAnalysisPage(view, lang) {
     })
     .join("");
 
-  // For balanced view, show both conclusions
-  let conclusionHtml = "";
-  if (view === "balanced") {
-    conclusionHtml = `
-      <div class="conclusion balanced">${t(content.analysis.conclusion, lang, "balanced")}</div>
-      <div class="framing-comparison conclusion-comparison">
-        <div class="framing-side conservative">
-          <div class="framing-label">${lang === "en" ? "Conservative Interpretation" : "Interpretación Conservadora"}</div>
-          <p class="framing-text">${t(content.analysis.conclusion.conservative, lang)}</p>
-        </div>
-        <div class="framing-side progressive">
-          <div class="framing-label">${lang === "en" ? "Progressive Interpretation" : "Interpretación Progresista"}</div>
-          <p class="framing-text">${t(content.analysis.conclusion.progressive, lang)}</p>
-        </div>
-      </div>`;
-  } else {
-    conclusionHtml = `<div class="conclusion ${view}">${t(content.analysis.conclusion, lang, view)}</div>`;
-  }
-
   const body = `
-    <section class="section-hero-small ${view}">
+    <section class="section-hero-small">
       <div class="section-inner">
         <h1 class="page-headline">${t(content.analysis.headline, lang)}</h1>
         <p class="page-intro">${t(content.analysis.intro, lang)}</p>
@@ -342,7 +280,7 @@ function generateAnalysisPage(view, lang) {
             </thead>
             <tbody>${decisionRows}</tbody>
           </table>
-          ${conclusionHtml}
+          <div class="conclusion">${t(content.analysis.conclusion, lang)}</div>
         </div>
         
         <div class="analysis-section">
@@ -357,7 +295,7 @@ function generateAnalysisPage(view, lang) {
       </div>
     </section>
     
-    <section class="section section-github-cta ${view}">
+    <section class="section section-github-cta">
       <div class="section-inner">
         <h3>${lang === "en" ? "Full Lean4 Formalization" : "Formalización Completa en Lean4"}</h3>
         <p>${lang === "en" ? "The proofs type-check." : "Las pruebas verifican tipos."}</p>
@@ -369,14 +307,13 @@ function generateAnalysisPage(view, lang) {
   return generatePage(
     lang === "en" ? "Analysis" : "Análisis",
     body,
-    view,
     lang,
     "analysis",
     "page-analysis",
   );
 }
 
-function generateMethodologyPage(view, lang) {
+function generateMethodologyPage(lang) {
   const sections = content.methodology.sections
     .map(
       (s) => `
@@ -389,7 +326,7 @@ function generateMethodologyPage(view, lang) {
     .join("");
 
   const body = `
-    <section class="section-hero-small ${view}">
+    <section class="section-hero-small">
       <div class="section-inner">
         <h1 class="page-headline">${t(content.methodology.headline, lang)}</h1>
         <p class="page-intro">${t(content.methodology.intro, lang)}</p>
@@ -406,14 +343,13 @@ function generateMethodologyPage(view, lang) {
   return generatePage(
     lang === "en" ? "Methodology" : "Metodología",
     body,
-    view,
     lang,
     "methodology",
     "page-methodology",
   );
 }
 
-function generateSourcesPage(view, lang) {
+function generateSourcesPage(lang) {
   const categories = [
     {
       title: { en: "FEC Filings", es: "Documentos de la FEC" },
@@ -492,7 +428,7 @@ function generateSourcesPage(view, lang) {
     .join("");
 
   const body = `
-    <section class="section-hero-small ${view}">
+    <section class="section-hero-small">
       <div class="section-inner">
         <h1 class="page-headline">${lang === "en" ? "Sources" : "Fuentes"}</h1>
         <p class="page-intro">${
@@ -513,14 +449,11 @@ function generateSourcesPage(view, lang) {
   return generatePage(
     lang === "en" ? "Sources" : "Fuentes",
     body,
-    view,
     lang,
     "sources",
     "page-sources",
   );
 }
-
-// Build
 
 function build() {
   if (fs.existsSync(DIST)) {
@@ -537,31 +470,27 @@ function build() {
     sources: generateSourcesPage,
   };
 
-  // Generate pages for each view/lang combo
-  for (const view of VIEWS) {
-    for (const lang of LANGS) {
-      for (const page of pages) {
-        const filename = `${page}-${view}-${lang}.html`;
-        const html = generators[page](view, lang);
-        fs.writeFileSync(path.join(DIST, filename), html);
-      }
+  for (const lang of LANGS) {
+    for (const page of pages) {
+      const filename = `${page}-${lang}.html`;
+      const html = generators[page](lang);
+      fs.writeFileSync(path.join(DIST, filename), html);
     }
   }
 
-  // Default index redirects to balanced/en
+  // Default index redirects to English
   fs.writeFileSync(
     path.join(DIST, "index.html"),
     `<!DOCTYPE html>
-<html><head><meta http-equiv="refresh" content="0; url=index-balanced-en.html"></head></html>`,
+<html><head><meta http-equiv="refresh" content="0; url=index-en.html"></head></html>`,
   );
 
-  // Copy CSS
   if (fs.existsSync("./static/style.css")) {
     fs.copyFileSync("./static/style.css", path.join(DIST, "style.css"));
   }
 
   console.log(
-    `Built to ./dist (${VIEWS.length} views × ${LANGS.length} langs × ${pages.length} pages = ${VIEWS.length * LANGS.length * pages.length} pages)`,
+    `Built to ./dist (${LANGS.length} langs × ${pages.length} pages = ${LANGS.length * pages.length} pages)`,
   );
 }
 
