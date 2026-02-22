@@ -1,18 +1,24 @@
 /* NULLIUS CHAKRABARTI
-   Game-theoretic candidate analysis
+   Four-lens political analysis
+   Red/Blue × EN/ES
    ========================================================= */
 
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
 
 :root {
-  /* Colors - analytical/neutral palette */
-  --primary: #1a1a2e;
-  --primary-light: #16213e;
-  --accent: #0f4c75;
-  --accent-light: #3282b8;
-  --highlight: #bbe1fa;
-  --warning: #e63946;
-  --success: #2a9d8f;
+  /* Red theme (Republican) */
+  --red-primary: #b91c1c;
+  --red-dark: #7f1d1d;
+  --red-light: #dc2626;
+  --red-bg: #fef2f2;
+  --red-accent: #ef4444;
+
+  /* Blue theme (Democrat) */
+  --blue-primary: #1d4ed8;
+  --blue-dark: #1e3a8a;
+  --blue-light: #3b82f6;
+  --blue-bg: #eff6ff;
+  --blue-accent: #60a5fa;
 
   /* Neutrals */
   --gray-50: #fafafa;
@@ -45,12 +51,12 @@
   --space-12: 3rem;
   --space-16: 4rem;
   --space-20: 5rem;
-  --space-24: 6rem;
 
   /* Layout */
   --max-width: 1100px;
   --content-width: 720px;
   --nav-height: 64px;
+  --tab-height: 48px;
 }
 
 /* Reset */
@@ -93,7 +99,7 @@ p {
 }
 
 a {
-  color: var(--accent);
+  color: inherit;
   text-decoration: none;
 }
 
@@ -107,7 +113,7 @@ strong {
 }
 
 blockquote {
-  border-left: 4px solid var(--accent);
+  border-left: 4px solid var(--gray-300);
   padding-left: var(--space-4);
   margin: var(--space-6) 0;
   font-style: italic;
@@ -122,6 +128,16 @@ blockquote cite {
   color: var(--gray-500);
 }
 
+ul,
+ol {
+  margin: var(--space-4) 0;
+  padding-left: var(--space-6);
+}
+
+li {
+  margin-bottom: var(--space-2);
+}
+
 /* Layout */
 .site {
   min-height: 100vh;
@@ -131,7 +147,81 @@ blockquote cite {
 
 .main {
   flex: 1;
-  padding-top: var(--nav-height);
+  padding-top: calc(var(--nav-height) + var(--tab-height));
+}
+
+/* ============================================
+   TAB SWITCHER
+   ============================================ */
+
+.tab-switcher {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  height: var(--tab-height);
+  background: var(--gray-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+}
+
+.tab {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  background: var(--gray-800);
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.tab:hover {
+  color: var(--white);
+  text-decoration: none;
+}
+
+.tab.red {
+  border-bottom: 2px solid transparent;
+}
+.tab.red:hover,
+.tab.red.active {
+  border-bottom-color: var(--red-accent);
+}
+.tab.red.active {
+  background: var(--red-dark);
+  color: var(--white);
+}
+
+.tab.blue {
+  border-bottom: 2px solid transparent;
+}
+.tab.blue:hover,
+.tab.blue.active {
+  border-bottom-color: var(--blue-accent);
+}
+.tab.blue.active {
+  background: var(--blue-dark);
+  color: var(--white);
+}
+
+.tab-hint {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--gray-600);
+  letter-spacing: 0.05em;
 }
 
 /* ============================================
@@ -140,13 +230,20 @@ blockquote cite {
 
 .nav {
   position: fixed;
-  top: 0;
+  top: var(--tab-height);
   left: 0;
   right: 0;
   z-index: 100;
   height: var(--nav-height);
-  background: var(--primary);
-  border-bottom: 2px solid var(--accent);
+  background: var(--white);
+  border-bottom: 2px solid var(--gray-200);
+}
+
+.nav.red {
+  border-bottom-color: var(--red-primary);
+}
+.nav.blue {
+  border-bottom-color: var(--blue-primary);
 }
 
 .nav-inner {
@@ -164,12 +261,14 @@ blockquote cite {
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: var(--white);
+  color: var(--black);
 }
 
-.nav-logo:hover {
-  text-decoration: none;
-  color: var(--highlight);
+.red .nav-logo:hover {
+  color: var(--red-primary);
+}
+.blue .nav-logo:hover {
+  color: var(--blue-primary);
 }
 
 .nav-links {
@@ -180,13 +279,18 @@ blockquote cite {
 .nav-link {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--gray-300);
+  color: var(--gray-600);
   transition: color 0.15s ease;
 }
 
 .nav-link:hover {
-  color: var(--white);
   text-decoration: none;
+}
+.red .nav-link:hover {
+  color: var(--red-primary);
+}
+.blue .nav-link:hover {
+  color: var(--blue-primary);
 }
 
 .nav-link-external::after {
@@ -199,48 +303,32 @@ blockquote cite {
    ============================================ */
 
 .hero {
-  min-height: 70vh;
+  min-height: 60vh;
   display: flex;
   align-items: center;
-  background: linear-gradient(
-    135deg,
-    var(--primary) 0%,
-    var(--primary-light) 100%
-  );
   position: relative;
 }
 
-.hero::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background:
-    radial-gradient(
-      circle at 20% 80%,
-      rgba(15, 76, 117, 0.3) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 80% 20%,
-      rgba(50, 130, 184, 0.2) 0%,
-      transparent 50%
-    );
-  pointer-events: none;
+.hero.red {
+  background: linear-gradient(135deg, var(--red-dark) 0%, var(--gray-900) 100%);
+}
+
+.hero.blue {
+  background: linear-gradient(
+    135deg,
+    var(--blue-dark) 0%,
+    var(--gray-900) 100%
+  );
 }
 
 .hero-inner {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: var(--space-16) var(--space-6);
-  position: relative;
-  z-index: 1;
 }
 
 .hero-headline {
-  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
   font-weight: 700;
   letter-spacing: 0.05em;
   color: var(--white);
@@ -248,11 +336,18 @@ blockquote cite {
 }
 
 .hero-subhead {
-  font-size: clamp(1.125rem, 2vw, 1.375rem);
-  font-weight: 400;
+  font-size: clamp(1rem, 2vw, 1.25rem);
   color: var(--gray-300);
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-4);
   max-width: 600px;
+}
+
+.hero-tagline {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-style: italic;
+  color: var(--gray-400);
+  margin-bottom: var(--space-8);
 }
 
 /* ============================================
@@ -275,14 +370,22 @@ blockquote cite {
   text-decoration: none;
 }
 
-.btn-primary {
-  background: var(--accent-light);
-  color: var(--white);
+.btn:hover {
+  text-decoration: none;
 }
 
-.btn-primary:hover {
-  background: var(--accent);
-  text-decoration: none;
+.btn-primary {
+  background: var(--white);
+  color: var(--gray-900);
+}
+
+.red .btn-primary:hover {
+  background: var(--red-bg);
+  color: var(--red-dark);
+}
+.blue .btn-primary:hover {
+  background: var(--blue-bg);
+  color: var(--blue-dark);
 }
 
 .btn-secondary {
@@ -293,8 +396,7 @@ blockquote cite {
 
 .btn-secondary:hover {
   background: var(--white);
-  color: var(--primary);
-  text-decoration: none;
+  color: var(--gray-900);
 }
 
 .btn-large {
@@ -318,14 +420,13 @@ blockquote cite {
 .section-headline {
   font-size: clamp(1.75rem, 4vw, 2.5rem);
   margin-bottom: var(--space-6);
-  color: var(--primary);
 }
 
-.section-intro {
-  font-size: 1.125rem;
-  color: var(--gray-600);
-  margin-bottom: var(--space-8);
-  max-width: var(--content-width);
+.red .section-headline {
+  color: var(--red-dark);
+}
+.blue .section-headline {
+  color: var(--blue-dark);
 }
 
 .section-body {
@@ -335,11 +436,18 @@ blockquote cite {
   max-width: var(--content-width);
 }
 
-/* Hero Small (interior pages) */
+/* Hero Small */
 .section-hero-small {
   padding: var(--space-16) var(--space-6) var(--space-10);
   background: var(--gray-100);
-  border-bottom: 1px solid var(--gray-200);
+  border-bottom: 2px solid var(--gray-200);
+}
+
+.section-hero-small.red {
+  border-bottom-color: var(--red-primary);
+}
+.section-hero-small.blue {
+  border-bottom-color: var(--blue-primary);
 }
 
 .page-headline {
@@ -354,19 +462,18 @@ blockquote cite {
 }
 
 /* ============================================
-   SUMMARY SECTION
-   ============================================ */
-
-.section-summary {
-  background: var(--white);
-}
-
-/* ============================================
-   KEY FINDINGS
+   FINDINGS
    ============================================ */
 
 .section-findings {
   background: var(--gray-50);
+}
+
+.section-findings.red {
+  background: var(--red-bg);
+}
+.section-findings.blue {
+  background: var(--blue-bg);
 }
 
 .findings-grid {
@@ -380,20 +487,28 @@ blockquote cite {
   border: 2px solid var(--gray-200);
   padding: var(--space-8);
   text-align: center;
-  transition: border-color 0.2s ease;
 }
 
-.finding-card:hover {
-  border-color: var(--accent);
+.red .finding-card {
+  border-color: var(--red-light);
+}
+.blue .finding-card {
+  border-color: var(--blue-light);
 }
 
 .finding-stat {
   font-family: var(--font-display);
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  color: var(--accent);
   line-height: 1;
   margin-bottom: var(--space-2);
+}
+
+.red .finding-stat {
+  color: var(--red-primary);
+}
+.blue .finding-stat {
+  color: var(--blue-primary);
 }
 
 .finding-label {
@@ -405,85 +520,58 @@ blockquote cite {
 
 .finding-context {
   font-size: 0.875rem;
-  color: var(--gray-500);
+  color: var(--gray-600);
   line-height: 1.5;
 }
 
 /* ============================================
-   STRAWMAN / STEELMAN / REASONABLE-MAN
-   ============================================ */
-
-.section-ssrm {
-  background: var(--white);
-}
-
-.ssrm-treatment {
-  margin-bottom: var(--space-6);
-  padding: var(--space-6);
-  border-left: 4px solid var(--gray-300);
-}
-
-.ssrm-treatment.strawman {
-  background: var(--gray-50);
-  border-left-color: var(--gray-400);
-}
-
-.ssrm-treatment.steelman {
-  background: rgba(15, 76, 117, 0.05);
-  border-left-color: var(--accent);
-}
-
-.ssrm-treatment.reasonable-man {
-  background: rgba(42, 157, 143, 0.05);
-  border-left-color: var(--success);
-}
-
-.treatment-title {
-  font-family: var(--font-display);
-  font-size: 1.125rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: var(--space-3);
-  color: var(--gray-600);
-}
-
-.ssrm-treatment.strawman .treatment-title {
-  color: var(--gray-500);
-}
-
-.ssrm-treatment.steelman .treatment-title {
-  color: var(--accent);
-}
-
-.ssrm-treatment.reasonable-man .treatment-title {
-  color: var(--success);
-}
-
-.treatment-body {
-  font-size: 1rem;
-  line-height: 1.8;
-  color: var(--gray-700);
-}
-
-/* ============================================
-   CTA SECTION
+   CTA
    ============================================ */
 
 .section-cta {
-  background: var(--primary);
   text-align: center;
   padding: var(--space-12) var(--space-6);
 }
 
+.section-cta.red {
+  background: var(--red-primary);
+}
+.section-cta.blue {
+  background: var(--blue-primary);
+}
+
 .cta-text {
   font-size: 1.125rem;
-  color: var(--gray-300);
+  color: var(--white);
   margin-bottom: var(--space-6);
+  max-width: none;
 }
 
 /* ============================================
-   BIOGRAPHY PAGE
+   BIOGRAPHY
    ============================================ */
+
+.section-bio-summary {
+  background: var(--white);
+  padding: var(--space-8) var(--space-6);
+}
+
+.bio-table {
+  width: 100%;
+  max-width: 500px;
+  border-collapse: collapse;
+}
+
+.bio-table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.bio-table td:first-child {
+  font-weight: 600;
+  color: var(--gray-600);
+  width: 40%;
+}
 
 .section-biography {
   background: var(--white);
@@ -503,96 +591,60 @@ blockquote cite {
 
 .bio-section-title {
   font-size: 1.5rem;
-  color: var(--accent);
   margin-bottom: var(--space-6);
   padding-bottom: var(--space-3);
-  border-bottom: 2px solid var(--accent);
+  border-bottom: 2px solid var(--gray-300);
 }
 
-.bio-section-content {
+.red .bio-section-title {
+  border-bottom-color: var(--red-primary);
+  color: var(--red-dark);
+}
+.blue .bio-section-title {
+  border-bottom-color: var(--blue-primary);
+  color: var(--blue-dark);
+}
+
+.bio-section-facts {
   font-size: 1rem;
   line-height: 1.8;
   color: var(--gray-700);
-  max-width: var(--content-width);
-}
-
-.bio-section-content h4 {
-  font-size: 1.125rem;
-  color: var(--gray-800);
-  margin: var(--space-6) 0 var(--space-3);
-}
-
-.bio-section-content p {
   margin-bottom: var(--space-4);
 }
 
-.bio-section-content ul,
-.bio-section-content ol {
-  margin: var(--space-4) 0;
-  padding-left: var(--space-6);
-}
-
-.bio-section-content li {
-  margin-bottom: var(--space-2);
-}
-
-.bio-section-content .notable {
-  background: rgba(15, 76, 117, 0.08);
+/* Framing blocks */
+.framing {
   padding: var(--space-4);
-  border-left: 3px solid var(--accent);
   margin: var(--space-4) 0;
+  border-left: 4px solid;
+  font-style: italic;
 }
 
-.bio-section-content .controversy {
-  background: rgba(230, 57, 70, 0.08);
-  padding: var(--space-4);
-  border-left: 3px solid var(--warning);
-  margin: var(--space-4) 0;
+.framing.red {
+  background: var(--red-bg);
+  border-left-color: var(--red-primary);
+  color: var(--red-dark);
 }
 
-.bio-section-content .missing-endorsements {
-  background: rgba(230, 57, 70, 0.05);
-  padding: var(--space-4);
-  border-radius: 4px;
+.framing.blue {
+  background: var(--blue-bg);
+  border-left-color: var(--blue-primary);
+  color: var(--blue-dark);
 }
 
-.bio-section-content .missing-endorsements li {
-  color: var(--gray-700);
+.bio-quote {
+  margin-top: var(--space-4);
 }
 
-/* Tables */
-.bio-table,
-.finance-table,
-.opponents-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: var(--space-4) 0;
-  font-size: 0.9375rem;
+.red .bio-quote {
+  border-left-color: var(--red-light);
 }
-
-.bio-table td,
-.finance-table td,
-.opponents-table td,
-.opponents-table th {
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--gray-200);
-}
-
-.bio-table td:first-child,
-.finance-table td:first-child {
-  font-weight: 600;
-  color: var(--gray-600);
-  width: 40%;
-}
-
-.opponents-table th {
-  text-align: left;
-  font-weight: 600;
-  background: var(--gray-100);
+.blue .bio-quote {
+  border-left-color: var(--blue-light);
 }
 
 /* ============================================
-   ANALYSIS PAGE
+   ANALYSIS
    ============================================ */
 
 .section-analysis {
@@ -607,37 +659,20 @@ blockquote cite {
 
 .analysis-section:last-child {
   border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
 }
 
 .analysis-section-title {
   font-size: 1.375rem;
-  color: var(--accent);
   margin-bottom: var(--space-6);
 }
 
-.analysis-section-content {
-  font-size: 1rem;
-  line-height: 1.8;
-  color: var(--gray-700);
-  max-width: var(--content-width);
+.red .analysis-section-title {
+  color: var(--red-dark);
+}
+.blue .analysis-section-title {
+  color: var(--blue-dark);
 }
 
-.analysis-section-content p {
-  margin-bottom: var(--space-4);
-}
-
-.analysis-section-content ol {
-  margin: var(--space-4) 0;
-  padding-left: var(--space-6);
-}
-
-.analysis-section-content li {
-  margin-bottom: var(--space-3);
-}
-
-/* Diagram */
 .chain-diagram {
   font-family: var(--font-mono);
   font-size: 0.875rem;
@@ -645,12 +680,9 @@ blockquote cite {
   padding: var(--space-6);
   border-radius: 4px;
   overflow-x: auto;
-  line-height: 1.6;
-  margin: var(--space-4) 0;
+  white-space: pre;
 }
 
-/* Analysis Tables */
-.signal-table,
 .bayes-table,
 .decision-table {
   width: 100%;
@@ -659,7 +691,6 @@ blockquote cite {
   font-size: 0.9375rem;
 }
 
-.signal-table th,
 .bayes-table th,
 .decision-table th {
   text-align: left;
@@ -669,7 +700,6 @@ blockquote cite {
   border-bottom: 2px solid var(--gray-300);
 }
 
-.signal-table td,
 .bayes-table td,
 .decision-table td {
   padding: var(--space-3) var(--space-4);
@@ -677,30 +707,68 @@ blockquote cite {
 }
 
 .bayes-table .final {
-  background: rgba(15, 76, 117, 0.1);
   font-weight: 600;
+}
+.red .bayes-table .final {
+  background: var(--red-bg);
+}
+.blue .bayes-table .final {
+  background: var(--blue-bg);
 }
 
 .decision-table .optimal {
-  background: rgba(42, 157, 143, 0.15);
+  font-weight: 600;
+}
+.red .decision-table .optimal {
+  background: var(--red-bg);
+}
+.blue .decision-table .optimal {
+  background: var(--blue-bg);
+}
+
+.conclusion {
+  padding: var(--space-6);
+  margin: var(--space-6) 0;
+  border-left: 4px solid;
+}
+
+.conclusion.red {
+  background: var(--red-bg);
+  border-left-color: var(--red-primary);
+}
+
+.conclusion.blue {
+  background: var(--blue-bg);
+  border-left-color: var(--blue-primary);
 }
 
 .key-question {
   font-size: 1.125rem;
-  font-style: italic;
-  color: var(--accent);
   text-align: center;
   padding: var(--space-6);
-  background: var(--gray-50);
-  border: 2px solid var(--accent);
   margin: var(--space-6) 0;
+  border: 2px solid;
 }
 
-/* GitHub CTA */
+.red .key-question {
+  border-color: var(--red-primary);
+  color: var(--red-dark);
+}
+.blue .key-question {
+  border-color: var(--blue-primary);
+  color: var(--blue-dark);
+}
+
 .section-github-cta {
-  background: var(--gray-100);
   text-align: center;
   padding: var(--space-12) var(--space-6);
+}
+
+.section-github-cta.red {
+  background: var(--red-bg);
+}
+.section-github-cta.blue {
+  background: var(--blue-bg);
 }
 
 .section-github-cta h3 {
@@ -714,8 +782,17 @@ blockquote cite {
   max-width: none;
 }
 
+.red .section-github-cta .btn-primary {
+  background: var(--red-primary);
+  color: var(--white);
+}
+.blue .section-github-cta .btn-primary {
+  background: var(--blue-primary);
+  color: var(--white);
+}
+
 /* ============================================
-   METHODOLOGY PAGE
+   METHODOLOGY
    ============================================ */
 
 .section-methodology {
@@ -730,14 +807,18 @@ blockquote cite {
 
 .methodology-section:last-child {
   border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
 }
 
 .methodology-section-title {
   font-size: 1.375rem;
-  color: var(--accent);
   margin-bottom: var(--space-4);
+}
+
+.red .methodology-section-title {
+  color: var(--red-dark);
+}
+.blue .methodology-section-title {
+  color: var(--blue-dark);
 }
 
 .methodology-section-body {
@@ -747,18 +828,8 @@ blockquote cite {
   max-width: var(--content-width);
 }
 
-.methodology-section-body ol,
-.methodology-section-body ul {
-  margin: var(--space-4) 0;
-  padding-left: var(--space-6);
-}
-
-.methodology-section-body li {
-  margin-bottom: var(--space-2);
-}
-
 /* ============================================
-   SOURCES PAGE
+   SOURCES
    ============================================ */
 
 .section-sources {
@@ -769,16 +840,18 @@ blockquote cite {
   margin-bottom: var(--space-10);
 }
 
-.sources-category:last-child {
-  margin-bottom: 0;
-}
-
 .sources-category-title {
   font-size: 1.25rem;
-  color: var(--accent);
   margin-bottom: var(--space-4);
   padding-bottom: var(--space-2);
   border-bottom: 2px solid var(--gray-200);
+}
+
+.red .sources-category-title {
+  color: var(--red-dark);
+}
+.blue .sources-category-title {
+  color: var(--blue-dark);
 }
 
 .sources-list {
@@ -793,12 +866,12 @@ blockquote cite {
 
 .sources-list a {
   color: var(--gray-800);
-  text-decoration: none;
 }
-
-.sources-list a:hover {
-  color: var(--accent);
-  text-decoration: underline;
+.red .sources-list a:hover {
+  color: var(--red-primary);
+}
+.blue .sources-list a:hover {
+  color: var(--blue-primary);
 }
 
 /* ============================================
@@ -807,8 +880,15 @@ blockquote cite {
 
 .footer {
   padding: var(--space-10) var(--space-6);
-  background: var(--primary);
+  background: var(--gray-900);
   color: var(--white);
+}
+
+.footer.red {
+  border-top: 4px solid var(--red-primary);
+}
+.footer.blue {
+  border-top: 4px solid var(--blue-primary);
 }
 
 .footer-inner {
@@ -855,6 +935,15 @@ blockquote cite {
 @media (max-width: 768px) {
   .nav-links {
     display: none;
+  }
+
+  .tab-hint {
+    display: none;
+  }
+
+  .tab {
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.625rem;
   }
 
   .hero {
